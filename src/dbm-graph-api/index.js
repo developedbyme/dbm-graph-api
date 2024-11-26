@@ -59,6 +59,13 @@ let fullEncodeSetup = function() {
     }
 
     {
+        let name = "url";
+        let currentEncode = new DbmGraphApi.range.encode.Url();
+        currentEncode.item.register(encodePrefix + name);
+        currentEncode.item.setValue("encodingType", name);
+    }
+
+    {
         let name = "urlRequest";
         let currentEncode = new DbmGraphApi.range.encode.UrlRequest();
         currentEncode.item.register(encodePrefix + name);
@@ -78,6 +85,7 @@ export let registerDataFunction = function(aName, aDataFunction) {
 
 let fullDataSetup = function() {
     registerDataFunction("example", new DbmGraphApi.data.Example());
+    registerDataFunction("admin/freeUrl", new DbmGraphApi.data.FreeUrl());
 }
 
 export {fullDataSetup};
