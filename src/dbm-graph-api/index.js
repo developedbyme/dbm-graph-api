@@ -3,6 +3,7 @@ import crypto from "node:crypto";
 
 import DbmGraphApi from "../../index.js";
 import Api from "./Api.js";
+import UrlRequest from "./UrlRequest.js";
 
 export {Api};
 
@@ -170,6 +171,24 @@ let setupEndpoints = function(aServer) {
 
 		//METODO: clear session from database
 		//METODO: clear cookie
+	});
+	
+	aServer.get('/api/url', async function handler (aRequest, aReply) {
+		//console.log(aRequest);
+		
+		let url = aRequest.query.url;
+		
+        if(url[url.length-1] !== "/") {
+            url += "/";
+        }
+		
+		console.log(url);
+        //METODO: check visibility in database
+		let request = new UrlRequest();
+
+		await request.requestUrl(url);
+		
+		return request.getResponse();
 	});
 
     //METODO: setup ranges
