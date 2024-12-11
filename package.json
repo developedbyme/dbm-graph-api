@@ -15,5 +15,8 @@
     "@aws-sdk/s3-request-presigner": "^3.693.0",
     "dbm": "^1.0.3",
     "ws": "^8.18.0"
+  },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.8"
   }
 }

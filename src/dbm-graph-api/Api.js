@@ -69,4 +69,15 @@ export default class Api extends Dbm.core.BaseObject {
             newWebSocketConnection.setInitialUser(0);
         }
     }
+	
+	connectionClosed(aConnection) {
+		//console.log("connectionClosed");
+		let connections = [].concat(this.item.connections);
+		let index = connections.indexOf(aConnection.item);
+		if(index >= 0) {
+			connections.splice(index, 1);
+		}
+		
+		this.item.setValue("connections", connections);
+	}
 }

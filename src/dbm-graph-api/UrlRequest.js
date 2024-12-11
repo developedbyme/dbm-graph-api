@@ -42,7 +42,7 @@ export default class UrlRequest extends Dbm.core.BaseObject {
 	}
 	
     outputEncodedData(aId, aData, aEncoding) {
-        console.log("UrlRequest::outputEncodedData");
+        //console.log("UrlRequest::outputEncodedData");
 		
 		this._encodedObjects.push({"id": aId, "data": aData, "encoding": aEncoding});
 		

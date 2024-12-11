@@ -8,6 +8,7 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
 
         this._callback_errorBound = this._callback_error.bind(this);
         this._callback_messageBound = this._callback_message.bind(this);
+		this._callback_closeBound = this._callback_close.bind(this);
     }
 
     setWebSocket(aWebSocket) {
@@ -237,19 +238,40 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
     }
 
     _callback_error(aMessage) {
+		console.log("_callback_error");
         console.error(aMessage);
     }
+	
+    _callback_close() {
+		//console.log("_callback_close");
+		
+		if(this._webSocket) {
+			this._webSocket.off('error', this._callback_error);
+			this._webSocket.off('message', this._callback_messageBound);
+			this._webSocket.off('close', this._callback_closeBound);
+			this._webSocket = null;
+		}
+		
+		this._callback_errorBound = null;
+		this._callback_messageBound = null;
+		this._callback_closeBound = null;
+		
+		this.item.api.controller.connectionClosed(this);
+		this.item.setValue("api", null);
+		this.item.setValue("controller", null);
+	}
 
     addListeners() {
 
         this._webSocket.on('error', this._callback_error);
         this._webSocket.on('message', this._callback_messageBound);
+		this._webSocket.on('close', this._callback_closeBound);
 
         return this;
     }
 
     outputEncodedData(aId, aData, aEncoding) {
-        console.log("WebSocketConnection::outputEncodedData");
+        //console.log("WebSocketConnection::outputEncodedData");
 
         this._webSocket.send(JSON.stringify({"type": "updateEncodedObject", "id": aId, "data": aData, "encoding": aEncoding}));
         
