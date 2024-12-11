@@ -227,6 +227,12 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
                     
                 }
                 break;
+            case "heartbeat":
+                {
+                    this._webSocket.send(JSON.stringify({"type": "heartbeat/response"}));
+                    
+                }
+                break;
         }	
     }
 
