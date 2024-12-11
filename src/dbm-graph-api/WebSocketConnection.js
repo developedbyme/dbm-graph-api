@@ -32,7 +32,7 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
     }
 
     async _callback_message(aDataString) {
-        console.log('received: %s', aDataString);
+        //console.log('received: %s', aDataString);
     
         let data;
 

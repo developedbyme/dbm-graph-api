@@ -49,7 +49,7 @@ export default class Api extends Dbm.core.BaseObject {
                     let user = Dbm.getInstance().repository.getItem("graphDatabase").controller.getUser(userId);
     
                     user.verifySession(value).then(function(aIsValidSession) {
-                        console.log("verifySession", aIsValidSession);
+                        //console.log("verifySession", aIsValidSession);
     
                         if(aIsValidSession) {
                             newWebSocketConnection.setInitialUser(userId);
