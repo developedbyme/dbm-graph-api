@@ -26,6 +26,30 @@ export let createDigitalOceanSpacesUpload = function(aKeyId, aSecret, aRegion, a
     newUploadS3.item.client = client;
     newUploadS3.item.bucketName = aBucketName;
     newUploadS3.item.publicPath = aPublicPath;
+    newUploadS3.item.publicResizePath = aPublicPath;
+
+    newUploadS3.item.additionalHeaders = {'x-amz-acl': 'public-read'};
+
+    return newUploadS3;
+}
+
+export let createCloudflareR2Upload = function(aAccountId, aAccessKeyId, aSecretAccessKeyId, aBucketName, aPublicPath) {
+
+    let client = new S3Client({
+        endpoint: "https://" + aAccountId + ".r2.cloudflarestorage.com",
+        forcePathStyle: false,
+        region: "auto",
+        credentials: {
+            accessKeyId: aAccessKeyId,
+            secretAccessKey: aSecretAccessKeyId
+        }
+    });
+
+    let newUploadS3 = new UploadS3();
+    newUploadS3.item.client = client;
+    newUploadS3.item.bucketName = aBucketName;
+    newUploadS3.item.publicPath = aPublicPath;
+    newUploadS3.item.publicResizePath = aPublicPath + "cdn-cgi/image/{scale}/";
 
     return newUploadS3;
 }

@@ -12,7 +12,9 @@ export default class UploadS3 extends Dbm.core.BaseObject {
         this.item.requireProperty("bucketName");
         this.item.requireProperty("path", "content/{year}/{month}/{date}/{generatedId}/");
         this.item.requireProperty("publicPath", "");
+        this.item.requireProperty("publicResizePath", "");
         this.item.requireProperty("acl", "public-read");
+        this.item.requireProperty("additionalHeaders", {});
     }
 
     async getData(aData, aEncodeSession) {
@@ -58,9 +60,12 @@ export default class UploadS3 extends Dbm.core.BaseObject {
 
         let presignedUrl = await getSignedUrl(this.item.client, command, { expiresIn: 360 });
 
+        returnObject["identifier"] = generatedId;
         returnObject["url"] = presignedUrl;
         returnObject["publicUrl"] = this.item.publicPath + fileName;
+        returnObject["publicResizeUrl"] = this.item.publicResizePath + fileName;
         returnObject["acl"] = acl;
+        returnObject["additionalHeaders"] = this.item.additionalHeaders;
 
         return returnObject;
     }
