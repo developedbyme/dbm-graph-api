@@ -18,6 +18,12 @@ let fullSelectSetup = function() {
         let currentSelect = new DbmGraphApi.range.select.IdSelection();
         currentSelect.item.register(selectPrefix + name);
     }
+
+    {
+        let name = "byObjectType";
+        let currentSelect = new DbmGraphApi.range.select.ByObjectType();
+        currentSelect.item.register(selectPrefix + name);
+    }
 }
 
 export {fullSelectSetup};

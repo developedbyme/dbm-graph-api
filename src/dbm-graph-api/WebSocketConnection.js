@@ -54,6 +54,7 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
                 let selectQuery = new DbmGraphApi.range.Query();
                 
                 let ids = [];
+                let logs = [];
 
                 {
                     let hasSelection = false;
@@ -66,6 +67,9 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
                         if(selection) {
                             hasSelection = true;
                             await selection.controller.select(selectQuery, currentSelectData, request);
+                        }
+                        else {
+                            logs.push("No selection named " + currentSelectType);
                         }
                     }
 
@@ -82,7 +86,7 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
                         }
                     }
                     else {
-                        //METODO: log error
+                        logs.push("No valid selections");
                     }
                     
                 }
@@ -102,7 +106,7 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
                     encodeSession.destroy();
                 }
                 
-                this._webSocket.send(JSON.stringify({"type": "range/response", "ids": ids, "requestId": data["requestId"]}));
+                this._webSocket.send(JSON.stringify({"type": "range/response", "ids": ids, "requestId": data["requestId"], "logs": logs}));
                 break;
             case "data":
                 {

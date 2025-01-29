@@ -22,10 +22,10 @@ export default class EncodeSession extends Dbm.core.BaseObject {
     }
 
     _encodeSingleNoAwait(aId, aType) {
-        console.log("_encodeSingleNoAwait");
+        //console.log("_encodeSingleNoAwait");
         
         let shouldEncode = this._readyToEncode(aId, aType);
-        console.log(shouldEncode, aId, aType);
+        //console.log(shouldEncode, aId, aType);
         if(shouldEncode) {
             let encoding = Dbm.getInstance().repository.getItemIfExists("graphApi/range/encode/" + aType);
             if(encoding) {
@@ -35,7 +35,7 @@ export default class EncodeSession extends Dbm.core.BaseObject {
     }
 
     async encodeSingle(aId, aType) {
-        console.log("encodeSingle");
+        //console.log("encodeSingle");
 
         await this._encodeSingleNoAwait(aId, aType);
     }

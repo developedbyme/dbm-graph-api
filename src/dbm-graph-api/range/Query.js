@@ -4,8 +4,21 @@ export default class Query extends Dbm.core.BaseObject {
     _construct() {
         super._construct();
 
+        this._joins = [];
+        this._whereStatements = [];
         this._includeOnly = null;
         this._visibilities = ["public"];
+    }
+
+    async setObjectType(aName) {
+        let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
+
+        let objectType = await database.getObjectType(aName);
+
+        this._joins.push("INNER JOIN ObjectTypesLink ON Objects.id = ObjectTypesLink.id");
+        this._whereStatements.push("ObjectTypesLink.type = " + objectType);
+
+        return this;
     }
 
     includeOnly(aIds) {
@@ -21,14 +34,20 @@ export default class Query extends Dbm.core.BaseObject {
 
     includeNone() {
         this._includeOnly = [];
+
+        return this;
     }
 
     async getIds() {
         let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
         
         let query = "SELECT Objects.id as id FROM Objects";
+
+        if(this._joins.length) {
+            query += " " + this._joins.join(" ");
+        }
         
-        let whereStatements = [];
+        let whereStatements = [].concat(this._whereStatements);
         if(this._includeOnly !== null) {
             if(this._includeOnly.length === 0) {
                 return [];
@@ -52,5 +71,12 @@ export default class Query extends Dbm.core.BaseObject {
 
 
         return returnArray;
+    }
+
+    async getObjects() {
+        let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
+        let ids = await this.getIds();
+
+        return database.getObjects(ids);
     }
 }
