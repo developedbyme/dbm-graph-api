@@ -5,6 +5,7 @@ export default class UrlRequest extends Dbm.core.BaseObject {
     _construct() {
         super._construct();
 		
+		this._logs = [];
 		this._encodedObjects = [];
 		this._responseData = null;
 	}
@@ -30,7 +31,67 @@ export default class UrlRequest extends Dbm.core.BaseObject {
 	}
 	
 	async requestRange(aSelects, aEncodes, aData) {
-		//METODO
+
+		let request = {}; //METODO
+
+        request.connection = this;
+
+		let selectQuery = new DbmGraphApi.range.Query();
+		
+		let ids = [];
+		let logs = [];
+
+		{
+			let hasSelection = false;
+			let currentArray = aSelects;
+			let currentArrayLength = currentArray.length;
+			for(let i = 0; i < currentArrayLength; i++) {
+				let currentSelectData = currentArray[i];
+				let currentSelectType = currentSelectData["type"];
+				let selection = Dbm.getInstance().repository.getItemIfExists("graphApi/range/select/" + currentSelectType);
+				if(selection) {
+					hasSelection = true;
+					await selection.controller.select(selectQuery, currentSelectData, request);
+				}
+				else {
+					this._logs.push("No selection named " + currentSelectType);
+				}
+			}
+
+			if(hasSelection) {
+				ids = await selectQuery.getIds();
+
+				for(let i = 0; i < currentArrayLength; i++) {
+					let currentSelectData = currentArray[i];
+					let currentSelectType = currentSelectData["type"];
+					let selection = Dbm.getInstance().repository.getItemIfExists("graphApi/range/select/" + currentSelectType);
+					if(selection) {
+						ids = await selection.controller.filter(ids, currentSelectData, request);
+					}
+				}
+			}
+			else {
+				this._logs.push("No valid selections");
+			}
+			
+		}
+				
+		{
+			let encodeSession = new DbmGraphApi.range.EncodeSession();
+			encodeSession.outputController = this;
+
+			let currentArray = aEncodes;
+			let currentArrayLength = currentArray.length;
+			for(let i = 0; i < currentArrayLength; i++) {
+				let currentType = currentArray[i];
+				
+				await encodeSession.encode(ids, currentType);
+			}
+
+			encodeSession.destroy();
+		}
+
+		this._responseData = {"ids": ids};
 	}
 	
 	async requestItem(aId, aEncodes) {
@@ -38,7 +99,17 @@ export default class UrlRequest extends Dbm.core.BaseObject {
 	}
 	
 	async requestData(aFunctionName, aData) {
-		//METODO
+		let encodeSession = new DbmGraphApi.range.EncodeSession();
+		encodeSession.outputController = this;
+
+		let dataFunctionItem = Dbm.getInstance().repository.getItemIfExists("graphApi/data/" + aFunctionName);
+		
+		let returnData = null;
+		if(dataFunctionItem) {
+			returnData = await dataFunctionItem.controller.getData(aData, encodeSession);
+		}
+
+		this._responseData = returnData;
 	}
 	
     outputEncodedData(aId, aData, aEncoding) {
@@ -49,6 +120,6 @@ export default class UrlRequest extends Dbm.core.BaseObject {
     }
 	
 	getResponse() {
-		return {"objects": this._encodedObjects, "data": this._responseData};
+		return {"objects": this._encodedObjects, "data": this._responseData, "logs": this._logs};
 	}
 }

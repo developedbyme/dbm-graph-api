@@ -78,6 +78,20 @@ let fullEncodeSetup = function() {
         currentEncode.item.register(encodePrefix + name);
         currentEncode.item.setValue("encodingType", name);
     }
+
+    {
+        let name = "breadcrumb";
+        let currentEncode = new DbmGraphApi.range.encode.Breadcrumb();
+        currentEncode.item.register(encodePrefix + name);
+        currentEncode.item.setValue("encodingType", name);
+    }
+
+    {
+        let name = "navigationName";
+        let currentEncode = new DbmGraphApi.range.encode.NavigationName();
+        currentEncode.item.register(encodePrefix + name);
+        currentEncode.item.setValue("encodingType", name);
+    }
 }
 
 export {fullEncodeSetup};
@@ -197,9 +211,38 @@ let setupEndpoints = function(aServer) {
 		return request.getResponse();
 	});
 
-    //METODO: setup ranges
+    aServer.get('/api/range/:selects/:encodes', async function handler (aRequest, aReply) {
+
+        let params = {...aRequest.query};
+        let selectIds = aRequest.params.selects.split(",");
+        let selects = new Array(selectIds.length);
+        let encodes = aRequest.params.encodes.split(",");
+
+        {
+            let currentArray = selectIds;
+            let currentArrayLength = currentArray.length;
+            for(let i = 0; i < currentArrayLength; i++) {
+                selects[i] = {...params, type: currentArray[i]};
+            }
+        }
+
+        let request = new UrlRequest();
+
+        await request.requestRange(selects, encodes, params);
+
+        return request.getResponse();
+    });
+
+    aServer.get('/api/data/:functionName', async function handler (aRequest, aReply) {
+        let params = {...aRequest.query};
+        let request = new UrlRequest();
+
+        await request.requestData(aRequest.params.functionName, params);
+
+        return request.getResponse();
+    });
+
     //METODO: setup edit
-    //METODO: setup data
     //METODO: setup actions
     //METODO: setup cron
 
