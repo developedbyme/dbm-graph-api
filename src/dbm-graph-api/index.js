@@ -233,6 +233,18 @@ let setupEndpoints = function(aServer) {
         return request.getResponse();
     });
 
+    aServer.get('/api/item/:id/:encodes', async function handler (aRequest, aReply) {
+        
+        let itemId = 1*aRequest.params.id;
+        let encodes = aRequest.params.encodes.split(",");
+
+        let request = new UrlRequest();
+
+        await request.requestItem(itemId, encodes);
+
+        return request.getResponse();
+    });
+
     aServer.get('/api/data/:functionName', async function handler (aRequest, aReply) {
         let params = {...aRequest.query};
         let request = new UrlRequest();

@@ -95,7 +95,14 @@ export default class UrlRequest extends Dbm.core.BaseObject {
 	}
 	
 	async requestItem(aId, aEncodes) {
-		//METODO
+		let encodeSession = new DbmGraphApi.range.EncodeSession();
+		encodeSession.outputController = this;
+
+		await encodeSession.encodeSingleWithTypes(aId, aEncodes);
+
+		encodeSession.destroy();
+
+		this._responseData = {"id": aId};
 	}
 	
 	async requestData(aFunctionName, aData) {
