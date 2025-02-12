@@ -118,6 +118,20 @@ export default class UrlRequest extends Dbm.core.BaseObject {
 
 		this._responseData = returnData;
 	}
+
+	async performAction(aFunctionName, aData) {
+		let encodeSession = new DbmGraphApi.range.EncodeSession();
+		encodeSession.outputController = this;
+
+		let dataFunctionItem = Dbm.getInstance().repository.getItemIfExists("graphApi/action/" + aFunctionName);
+		
+		let returnData = null;
+		if(dataFunctionItem) {
+			returnData = await dataFunctionItem.controller.performAction(aData, encodeSession);
+		}
+
+		this._responseData = returnData;
+	}
 	
     outputEncodedData(aId, aData, aEncoding) {
         //console.log("UrlRequest::outputEncodedData");

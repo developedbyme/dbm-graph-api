@@ -6,7 +6,7 @@ export default class SetUrl extends EditBaseObject {
         super._construct();
     }
 
-    performChange(aObject, aData, aRequest) {
-        aObject.setUrl(aData["value"]);
+    async performChange(aObject, aData, aRequest) {
+        await aObject.setUrl(aData["value"]);
     }
 }

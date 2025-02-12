@@ -6,7 +6,7 @@ export default class AddOutgoingRelation extends EditBaseObject {
         super._construct();
     }
 
-    performChange(aObject, aData, aRequest) {
-        aObject.addOutgoingRelation(aData["value"], aData["type"]);
+    async performChange(aObject, aData, aRequest) {
+        await aObject.addOutgoingRelation(aData["value"], aData["type"]);
     }
 }

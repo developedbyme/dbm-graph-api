@@ -6,7 +6,7 @@ export default class SetField extends EditBaseObject {
         super._construct();
     }
 
-    performChange(aObject, aData, aRequest) {
-        aObject.updateField(aData["field"], aData["value"]);
+    async performChange(aObject, aData, aRequest) {
+        await aObject.updateField(aData["field"], aData["value"]);
     }
 }

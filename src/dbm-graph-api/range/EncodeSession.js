@@ -6,6 +6,8 @@ export default class EncodeSession extends Dbm.core.BaseObject {
 
         this._encodings = {};
         this.outputController = null;
+
+        //METODO: add cache of database objects
     }
 
     _readyToEncode(aId, aType) {

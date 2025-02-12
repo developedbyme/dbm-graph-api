@@ -1,5 +1,6 @@
 import Dbm from "dbm";
 import crypto from "node:crypto";
+import url from "node:url";
 
 import DbmGraphApi from "../../index.js";
 import Api from "./Api.js";
@@ -10,6 +11,7 @@ export {Api};
 export * as range from "./range/index.js";
 export * as admin from "./admin/index.js";
 export * as data from "./data/index.js";
+export * as action from "./action/index.js";
 
 let fullSelectSetup = function() {
     let selectPrefix = "graphApi/range/select/";
@@ -107,15 +109,31 @@ export let registerDataFunction = function(aName, aDataFunction) {
 let fullDataSetup = function() {
     registerDataFunction("example", new DbmGraphApi.data.Example());
     registerDataFunction("admin/freeUrl", new DbmGraphApi.data.FreeUrl());
+    registerDataFunction("admin/seoSummary", new DbmGraphApi.data.SeoSummary());
 }
 
 export {fullDataSetup};
+
+export let registerActionFunction = function(aName, aDataFunction) {
+
+    aDataFunction.item.register("graphApi/action/" + aName);
+    aDataFunction.item.setValue("functionName", aName);
+
+    return aDataFunction;
+}
+
+let fullActionSetup = function() {
+    registerActionFunction("example", new DbmGraphApi.action.Example());
+}
+
+export {fullActionSetup};
 
 let fullSetup = function() {
 
     fullSelectSetup();
     fullEncodeSetup();
     fullDataSetup();
+    fullActionSetup();
     
     DbmGraphApi.admin.edit.fullSetup();
 }
@@ -245,18 +263,44 @@ let setupEndpoints = function(aServer) {
         return request.getResponse();
     });
 
-    aServer.get('/api/data/:functionName', async function handler (aRequest, aReply) {
+    aServer.get('/api/data/*', async function handler (aRequest, aReply) {
         let params = {...aRequest.query};
         let request = new UrlRequest();
 
-        await request.requestData(aRequest.params.functionName, params);
+        let currentUrl = url.parse(aRequest.url);
+        let functionName = currentUrl.pathname.substring("/api/data/".length);
+
+        await request.requestData(functionName, params);
+
+        return request.getResponse();
+    });
+
+    aServer.get('/api/action/*', async function handler (aRequest, aReply) {
+        
+        let params = {...aRequest.query};
+        let request = new UrlRequest();
+
+        let currentUrl = url.parse(aRequest.url);
+        let functionName = currentUrl.pathname.substring("/api/action/".length);
+
+        await request.performAction(functionName, params);
+
+        return request.getResponse();
+    });
+
+    aServer.post('/api/action/*', async function handler (aRequest, aReply) {
+        let params = {...aRequest.body};
+        let request = new UrlRequest();
+
+        let currentUrl = url.parse(aRequest.url);
+        let functionName = currentUrl.pathname.substring("/api/action/".length);
+
+        await request.performAction(functionName, params);
 
         return request.getResponse();
     });
 
     //METODO: setup edit
-    //METODO: setup actions
-    //METODO: setup cron
 
     aServer.get('/api/', async function handler (aRequest, aResponse) {
 		return { version: Dbm.getInstance().repository.getItem("site").version };

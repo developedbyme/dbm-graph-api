@@ -5,7 +5,7 @@ export default class EditBaseObject extends Dbm.core.BaseObject {
         super._construct();
     }
 
-    performChange(aObject, aData, aRequest) {
+    async performChange(aObject, aData, aRequest) {
         //MENOTE: should be overridden
     }
 }
