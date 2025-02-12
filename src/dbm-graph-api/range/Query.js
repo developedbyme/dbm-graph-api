@@ -38,6 +38,38 @@ export default class Query extends Dbm.core.BaseObject {
         return this;
     }
 
+    includePrivate() {
+        this._visibilities.push("private");
+
+        return this;
+    }
+
+    includeDraft() {
+        this._visibilities.push("draft");
+
+        return this;
+    }
+
+    addFieldQuery(aKey, aValue) {
+
+        let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
+
+        this._joins.push("INNER JOIN Fields ON Objects.id = Fields.object");
+        this._whereStatements.push("Fields.name = " + database.connection.escape(aKey));
+        this._whereStatements.push("Fields.value = " + database.connection.escape(JSON.stringify(aValue)));
+
+        return this;
+    }
+
+    withIdentifier(aIdentifier) {
+        let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
+
+        this._joins.push("INNER JOIN Identifiers ON Objects.id = Identifiers.object");
+        this._whereStatements.push("Identifiers.identifier = " + database.connection.escape(aIdentifier));
+
+        return this;
+    }
+
     async getIds() {
         let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
         
@@ -55,7 +87,17 @@ export default class Query extends Dbm.core.BaseObject {
             whereStatements.push("Objects.id IN (" + this._includeOnly.join(",") + ")");
         }
 
-        //METODO: include visibility
+        {
+            let visibilityIds = [];
+            let currentArray = this._visibilities;
+            let currentArrayLength = currentArray.length;
+            for(let i = 0; i < currentArrayLength; i++) {
+                let currentId = await database.getVisibilityType(currentArray[i]);
+                visibilityIds.push(currentId);
+            }
+
+            whereStatements.push("Objects.visibility IN (" + visibilityIds.join(",") + ")");
+        }
 
         if(whereStatements.length) {
             query += " WHERE " + whereStatements.join(" AND ");
