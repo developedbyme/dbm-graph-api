@@ -8,6 +8,7 @@ export default class Query extends Dbm.core.BaseObject {
         this._whereStatements = [];
         this._includeOnly = null;
         this._visibilities = ["public"];
+        this._skipVisibility = false;
     }
 
     async setObjectType(aName) {
@@ -87,7 +88,7 @@ export default class Query extends Dbm.core.BaseObject {
             whereStatements.push("Objects.id IN (" + this._includeOnly.join(",") + ")");
         }
 
-        {
+        if(!this._skipVisibility) {
             let visibilityIds = [];
             let currentArray = this._visibilities;
             let currentArrayLength = currentArray.length;
