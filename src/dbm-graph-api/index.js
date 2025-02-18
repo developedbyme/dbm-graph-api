@@ -26,6 +26,12 @@ let fullSelectSetup = function() {
         let currentSelect = new DbmGraphApi.range.select.ByObjectType();
         currentSelect.item.register(selectPrefix + name);
     }
+
+    {
+        let name = "includePrivate";
+        let currentSelect = new DbmGraphApi.range.select.IncludePrivate();
+        currentSelect.item.register(selectPrefix + name);
+    }
 }
 
 export {fullSelectSetup};
@@ -91,6 +97,13 @@ let fullEncodeSetup = function() {
     {
         let name = "navigationName";
         let currentEncode = new DbmGraphApi.range.encode.NavigationName();
+        currentEncode.item.register(encodePrefix + name);
+        currentEncode.item.setValue("encodingType", name);
+    }
+
+    {
+        let name = "type";
+        let currentEncode = new DbmGraphApi.range.encode.Type();
         currentEncode.item.register(encodePrefix + name);
         currentEncode.item.setValue("encodingType", name);
     }

@@ -56,7 +56,6 @@ export default class EncodeSession extends Dbm.core.BaseObject {
     async encode(aIds, aType) {
         let currentArray = aIds;
         let currentArrayLength = currentArray.length;
-        let ids = new Array(currentArrayLength);
         let promises = new Array(currentArrayLength);
         for(let i = 0; i < currentArrayLength; i++) {
             let id = currentArray[i];
@@ -65,7 +64,7 @@ export default class EncodeSession extends Dbm.core.BaseObject {
 
         await Promise.all(promises);
 
-        return ids;
+        return aIds;
     }
 
     async encodeObjectOrNull(aObject, aType) {

@@ -2,18 +2,14 @@ import Dbm from "dbm";
 
 import SelectBaseObject from "./SelectBaseObject.js";
 
-export default class ByObjectType extends SelectBaseObject {
+export default class IncludePrivate extends SelectBaseObject {
     _construct() {
         super._construct();
     }
 
     async select(aQuery, aData, aRequest) {
-
-        if(!aData["objectType"]) {
-            throw("Parameter objectType not set");
-        }
-
-        await aQuery.setObjectType(aData["objectType"]);
+        //METODO: check that we are allowed
+        aQuery.includePrivate();
     }
 
     async filter(aIds, aData, aRequest) {

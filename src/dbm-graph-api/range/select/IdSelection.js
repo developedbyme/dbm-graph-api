@@ -8,7 +8,7 @@ export default class IdSelection extends SelectBaseObject {
     }
 
     async select(aQuery, aData, aRequest) {
-        aQuery.includeOnly(aData["ids"]);
+        aQuery.includeOnly(Dbm.utils.ArrayFunctions.arrayOrSeparatedString(aData["ids"]));
     }
 
     async filter(aIds, aData, aRequest) {

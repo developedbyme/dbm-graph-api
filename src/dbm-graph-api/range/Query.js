@@ -51,6 +51,12 @@ export default class Query extends Dbm.core.BaseObject {
         return this;
     }
 
+    includeAnyStatus() {
+        this._skipVisibility = true;
+
+        return this;
+    }
+
     addFieldQuery(aKey, aValue) {
 
         let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
@@ -121,5 +127,17 @@ export default class Query extends Dbm.core.BaseObject {
         let ids = await this.getIds();
 
         return database.getObjects(ids);
+    }
+
+    async getObject() {
+        let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
+        let ids = await this.getIds();
+
+        if(ids.length) {
+            //METODO: warning if more than 1
+            return database.getObject(ids[0]);
+        }
+
+        return null;
     }
 }
