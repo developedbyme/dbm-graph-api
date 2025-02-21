@@ -12,6 +12,7 @@ export * as range from "./range/index.js";
 export * as admin from "./admin/index.js";
 export * as data from "./data/index.js";
 export * as action from "./action/index.js";
+export * as processAction from "./processAction/index.js";
 
 let fullSelectSetup = function() {
     let selectPrefix = "graphApi/range/select/";
@@ -137,9 +138,25 @@ export let registerActionFunction = function(aName, aDataFunction) {
 
 let fullActionSetup = function() {
     registerActionFunction("example", new DbmGraphApi.action.Example());
+    registerActionFunction("incomingWebhook", new DbmGraphApi.action.IncomingWebhook());
+    registerActionFunction("cron/processActions", new DbmGraphApi.action.cron.ProcessActions());
 }
 
 export {fullActionSetup};
+
+export let registerProcessActionFunction = function(aName, aDataFunction) {
+
+    aDataFunction.item.register("graphApi/processAction/" + aName);
+    aDataFunction.item.setValue("functionName", aName);
+
+    return aDataFunction;
+}
+
+let fullProcessActionSetup = function() {
+    registerProcessActionFunction("example", new DbmGraphApi.processAction.Example());
+}
+
+export {fullProcessActionSetup};
 
 let fullSetup = function() {
 
@@ -147,6 +164,7 @@ let fullSetup = function() {
     fullEncodeSetup();
     fullDataSetup();
     fullActionSetup();
+    fullProcessActionSetup()
     
     DbmGraphApi.admin.edit.fullSetup();
 }
@@ -312,6 +330,8 @@ let setupEndpoints = function(aServer) {
 
         return request.getResponse();
     });
+
+    //METODO: setup raw data posts
 
     //METODO: setup edit
 
