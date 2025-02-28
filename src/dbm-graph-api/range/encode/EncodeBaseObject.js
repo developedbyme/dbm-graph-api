@@ -33,4 +33,12 @@ export default class EncodeBaseObject extends Dbm.core.BaseObject {
 
         return {};
     }
+
+    _dataOrNull(aData) {
+        if(aData === undefined) {
+            return null;
+        }
+
+        return aData;
+    }
 }

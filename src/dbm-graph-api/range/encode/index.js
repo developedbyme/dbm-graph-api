@@ -10,3 +10,4 @@ export {default as Url} from "./Url.js";
 export {default as Breadcrumb} from "./Breadcrumb.js";
 export {default as NavigationName} from "./NavigationName.js";
 export {default as Type} from "./Type.js";
+export {default as Image} from "./Image.js";
