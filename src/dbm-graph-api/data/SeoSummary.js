@@ -26,6 +26,7 @@ export default class SeoSummary extends Dbm.core.BaseObject {
 
         let body = {
             "model": "gpt-4o-mini",
+            "response_format": { "type": "json_object" },
             "messages": [
                {"role":"system","content": instructions},
                {"role": "user", "content": contentString}

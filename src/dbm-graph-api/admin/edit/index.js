@@ -2,15 +2,22 @@ import DbmGraphApi from "../../../../index.js";
 export {default as EditBaseObject} from "./EditBaseObject.js";
 
 export {default as SetField} from "./SetField.js";
+export {default as SetIdentifier} from "./SetIdentifier.js";
 export {default as SetUrl} from "./SetUrl.js";
 export {default as AddIncomingRelation} from "./AddIncomingRelation.js";
 export {default as AddOutgoingRelation} from "./AddOutgoingRelation.js";
 
-let fullSetup = function() {
+export const fullSetup = function() {
     let prefix = "graphApi/admin/edit/";
     {
         let name = "setField";
         let currentSelect = new DbmGraphApi.admin.edit.SetField();
+        currentSelect.item.register(prefix + name);
+    }
+
+    {
+        let name = "setIdentifier";
+        let currentSelect = new DbmGraphApi.admin.edit.SetIdentifier();
         currentSelect.item.register(prefix + name);
     }
 
@@ -32,5 +39,3 @@ let fullSetup = function() {
         currentSelect.item.register(prefix + name);
     }
 }
-
-export {fullSetup};

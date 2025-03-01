@@ -2,6 +2,7 @@ export {default as Example} from "./Example.js";
 export {default as UploadS3} from "./UploadS3.js";
 export {default as FreeUrl} from "./FreeUrl.js";
 export {default as SeoSummary} from "./SeoSummary.js";
+export {default as AltText} from "./AltText.js";
 
 import UploadS3 from "./UploadS3.js";
 

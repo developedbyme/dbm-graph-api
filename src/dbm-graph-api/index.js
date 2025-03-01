@@ -131,6 +131,7 @@ let fullDataSetup = function() {
     registerDataFunction("example", new DbmGraphApi.data.Example());
     registerDataFunction("admin/freeUrl", new DbmGraphApi.data.FreeUrl());
     registerDataFunction("admin/seoSummary", new DbmGraphApi.data.SeoSummary());
+    registerDataFunction("admin/altText", new DbmGraphApi.data.AltText());
 }
 
 export {fullDataSetup};
