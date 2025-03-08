@@ -6,6 +6,9 @@ export default class Example extends Dbm.core.BaseObject {
     }
 
     async getData(aData, aEncodeSession) {
+
+        await aEncodeSession.outputController.requireRole("admin");
+
         let returnObject = {};
 
         let requestedUrl = aData["url"];

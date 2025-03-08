@@ -6,6 +6,8 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
         super._construct();
         this._webSocket = null;
 
+        this.item.requireProperty("user", null);
+
         this._callback_errorBound = this._callback_error.bind(this);
         this._callback_messageBound = this._callback_message.bind(this);
 		this._callback_closeBound = this._callback_close.bind(this);
@@ -181,27 +183,38 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
                 break;
             case "admin/createObject":
                 {
-                    let types = data['types'];
-                    let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
-                    let visibility = data['visibility'] ? data['visibility'] : 'draft';
+                    //METODO: require role
+                    let returnId = 0;
+                    let user = await this.getUser();
+                    if(user) {
+                        let types = data['types'];
+                        let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
+                        let visibility = data['visibility'] ? data['visibility'] : 'draft';
+    
+                        let draftVisibility = await database.getVisibilityType(visibility);
+    
+                        let newObject = await database.createObject(draftVisibility, types);
+    
+                        if(data.changes) {
+                            await this._applyChanges(newObject, data.changes, request);
+                        }
+                        
+                        if(data.encode) {
+    
+                            let encodeSession = new DbmGraphApi.range.EncodeSession();
+                            encodeSession.outputController = this;
+    
+                            await encodeSession.encodeSingleWithTypes(newObject.id, data.encode);
+    
+                            encodeSession.destroy();
+                        }
 
-                    let draftVisibility = await database.getVisibilityType(visibility);
-
-		            let newObject = await database.createObject(draftVisibility, types);
-
-                    if(data.changes) {
-                        await this._applyChanges(newObject, data.changes, request);
+                        returnId = newObject.id;
+                    }
+                    else {
+                        //METODO: add logs
                     }
                     
-                    if(data.encode) {
-
-                        let encodeSession = new DbmGraphApi.range.EncodeSession();
-                        encodeSession.outputController = this;
-
-                        await encodeSession.encodeSingleWithTypes(newObject.id, data.encode);
-
-                        encodeSession.destroy();
-                    }
                     
                     this._webSocket.send(JSON.stringify({"type": "item/response", "id": newObject.id, "requestId": data["requestId"]}));
                 }
@@ -212,19 +225,26 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
 
                     let theObject = database.getObject(data.id);
 
-                    if(data.changes) {
-                        await this._applyChanges(theObject, data.changes, request);
+                    let user = await this.getUser();
+                    if(user) {
+                        if(data.changes) {
+                            await this._applyChanges(theObject, data.changes, request);
+                        }
+                        
+                        if(data.encode) {
+    
+                            let encodeSession = new DbmGraphApi.range.EncodeSession();
+                            encodeSession.outputController = this;
+    
+                            await encodeSession.encodeSingleWithTypes(theObject.id, data.encode);
+    
+                            encodeSession.destroy();
+                        }
+                    }
+                    else {
+                        //METODO: add log
                     }
                     
-                    if(data.encode) {
-
-                        let encodeSession = new DbmGraphApi.range.EncodeSession();
-                        encodeSession.outputController = this;
-
-                        await encodeSession.encodeSingleWithTypes(theObject.id, data.encode);
-
-                        encodeSession.destroy();
-                    }
                     
                     this._webSocket.send(JSON.stringify({"type": "item/response", "id": theObject.id, "requestId": data["requestId"]}));
                 }
@@ -240,7 +260,9 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
                     let userId = 0;
                     if(isVerified) {
                         //METODO: set user for connection
+                        
                         userId = user.id;
+                        this.item.setValue("user", user);
                     }
 
                     this._webSocket.send(JSON.stringify({"type": "currentUser/response", "id": userId, "requestId": data["requestId"]}));
@@ -298,8 +320,25 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
 
     setInitialUser(aId) {
 
-        //METODO: set the user for connection
+        let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
+
+        let user = database.getUser(aId);
+        this.item.setValue("user", user);
 
         this._webSocket.send(JSON.stringify({"type": "connectionReady", "user": aId}));
     }
+
+    async getUser() {
+        return this.item.user;
+    }
+
+    async requireRole(aRole) {
+		let user = await this.getUser();
+
+		if(!user) {
+			throw("Only signed in users can use this endpoint");
+		}
+
+		return true;
+	}
 }

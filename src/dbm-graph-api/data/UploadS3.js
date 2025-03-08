@@ -18,6 +18,9 @@ export default class UploadS3 extends Dbm.core.BaseObject {
     }
 
     async getData(aData, aEncodeSession) {
+
+        await aEncodeSession.outputController.requireRole("admin");
+
         let returnObject = {};
 
         let originalFileName = aData["fileName"];

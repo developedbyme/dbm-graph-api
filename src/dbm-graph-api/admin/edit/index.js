@@ -6,6 +6,7 @@ export {default as SetIdentifier} from "./SetIdentifier.js";
 export {default as SetUrl} from "./SetUrl.js";
 export {default as AddIncomingRelation} from "./AddIncomingRelation.js";
 export {default as AddOutgoingRelation} from "./AddOutgoingRelation.js";
+export {default as ClearCloudflareCache} from "./ClearCloudflareCache.js";
 
 export const fullSetup = function() {
     let prefix = "graphApi/admin/edit/";
@@ -36,6 +37,12 @@ export const fullSetup = function() {
     {
         let name = "addOutgoingRelation";
         let currentSelect = new DbmGraphApi.admin.edit.AddOutgoingRelation();
+        currentSelect.item.register(prefix + name);
+    }
+
+    {
+        let name = "clearCache";
+        let currentSelect = new DbmGraphApi.admin.edit.ClearCloudflareCache();
         currentSelect.item.register(prefix + name);
     }
 }

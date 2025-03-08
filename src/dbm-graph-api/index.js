@@ -262,6 +262,7 @@ let setupEndpoints = function(aServer) {
 		console.log(url);
         //METODO: check visibility in database
 		let request = new UrlRequest();
+        request.setup(aRequest, aReply);
 
 		await request.requestUrl(url);
 		
@@ -284,6 +285,7 @@ let setupEndpoints = function(aServer) {
         }
 
         let request = new UrlRequest();
+        request.setup(aRequest, aReply);
 
         await request.requestRange(selects, encodes, params);
 
@@ -296,6 +298,7 @@ let setupEndpoints = function(aServer) {
         let encodes = aRequest.params.encodes.split(",");
 
         let request = new UrlRequest();
+        request.setup(aRequest, aReply);
 
         await request.requestItem(itemId, encodes);
 
@@ -305,6 +308,7 @@ let setupEndpoints = function(aServer) {
     aServer.get('/api/data/*', async function handler (aRequest, aReply) {
         let params = {...aRequest.query};
         let request = new UrlRequest();
+        request.setup(aRequest, aReply);
 
         let currentUrl = url.parse(aRequest.url);
         let functionName = currentUrl.pathname.substring("/api/data/".length);
@@ -318,6 +322,7 @@ let setupEndpoints = function(aServer) {
         
         let params = {...aRequest.query};
         let request = new UrlRequest();
+        request.setup(aRequest, aReply);
 
         let currentUrl = url.parse(aRequest.url);
         let functionName = currentUrl.pathname.substring("/api/action/".length);
@@ -330,6 +335,7 @@ let setupEndpoints = function(aServer) {
     aServer.post('/api/action/*', async function handler (aRequest, aReply) {
         let params = {...aRequest.body};
         let request = new UrlRequest();
+        request.setup(aRequest, aReply);
 
         let currentUrl = url.parse(aRequest.url);
         let functionName = currentUrl.pathname.substring("/api/action/".length);
@@ -340,6 +346,33 @@ let setupEndpoints = function(aServer) {
     });
 
     //METODO: setup raw data posts
+
+    aServer.get('/api/webhook/*', async function handler (aRequest, aReply) {
+        
+        let params = {...aRequest.query};
+        let request = new UrlRequest();
+        request.setup(aRequest, aReply);
+
+        let currentUrl = url.parse(aRequest.url);
+        let webhookType = currentUrl.pathname.substring("/api/incomingWebhook/".length);
+
+        await request.incomingWebhook(webhookType, params);
+
+        return request.getResponse();
+    });
+
+    aServer.post('/api/webhook/*', async function handler (aRequest, aReply) {
+        let params = {...aRequest.body};
+        let request = new UrlRequest();
+        request.setup(aRequest, aReply);
+
+        let currentUrl = url.parse(aRequest.url);
+        let webhookType = currentUrl.pathname.substring("/api/incomingWebhook/".length);
+
+        await request.incomingWebhook(webhookType, params);
+
+        return request.getResponse();
+    });
 
     //METODO: setup edit
 

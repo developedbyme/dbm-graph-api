@@ -9,6 +9,9 @@ export default class IncludePrivate extends SelectBaseObject {
 
     async select(aQuery, aData, aRequest) {
         //METODO: check that we are allowed
+
+        await aRequest.connection.requireRole("admin");
+
         aQuery.includePrivate();
     }
 

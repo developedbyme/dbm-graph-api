@@ -8,6 +8,19 @@ export default class UrlRequest extends Dbm.core.BaseObject {
 		this._logs = [];
 		this._encodedObjects = [];
 		this._responseData = null;
+
+		this._request = null;
+		this._reply = null;
+
+		this.item.requireProperty("hasLoadedUser", false);
+		this.item.requireProperty("user", null);
+	}
+
+	setup(aRequest, aReply) {
+		this._request = aRequest;
+		this._reply = aReply;
+
+		return null;
 	}
 	
 	async requestUrl(aUrl) {
@@ -98,6 +111,8 @@ export default class UrlRequest extends Dbm.core.BaseObject {
 		let encodeSession = new DbmGraphApi.range.EncodeSession();
 		encodeSession.outputController = this;
 
+		//METODO: check visibility
+
 		await encodeSession.encodeSingleWithTypes(aId, aEncodes);
 
 		encodeSession.destroy();
@@ -132,6 +147,37 @@ export default class UrlRequest extends Dbm.core.BaseObject {
 
 		this._responseData = returnData;
 	}
+
+	async incomingWebhook(aWebhookType, aData) {
+		let encodeSession = new DbmGraphApi.range.EncodeSession();
+		encodeSession.outputController = this;
+
+		let returnObject = {};
+
+		let type = aWebhookType;
+		let data = aData;
+
+		let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
+				
+		let webhookType = await database.getTypeObject("type/webhookType", type);
+
+		let incomingWebhook = await database.createObject("private", ["incomingWebhook"]);
+		await incomingWebhook.updateField("data", data);
+		await incomingWebhook.addIncomingRelation(webhookType, "for");
+		
+		let actionType = await database.getTypeObject("type/actionType", "incomingWebhook/" + type);
+		let actionStatus = await database.getTypeObject("status/actionStatus", "readyToProcess");
+		
+		let action = await database.createObject("private", ["action"]);
+		await action.addIncomingRelation(actionType, "for");
+		await action.addIncomingRelation(incomingWebhook, "from");
+		await action.addIncomingRelation(actionStatus, "for");
+
+		returnObject["id"] = incomingWebhook.id;
+		returnObject["action"] = action.id;
+
+		this._responseData = returnObject;
+	}
 	
     outputEncodedData(aId, aData, aEncoding) {
         //console.log("UrlRequest::outputEncodedData");
@@ -142,5 +188,51 @@ export default class UrlRequest extends Dbm.core.BaseObject {
 	
 	getResponse() {
 		return {"objects": this._encodedObjects, "data": this._responseData, "logs": this._logs};
+	}
+
+	async _loadUser() {
+		
+		if(this._request.headers.cookie) {
+			let cookies = this._request.headers.cookie.split(";");
+			let currentArray = cookies;
+			let currentArrayLength = currentArray.length;
+			for(let i = 0; i < currentArrayLength; i++) {
+				let [key, value] = currentArray[i].split("=");
+				if(key === "dbm_session" || key === " dbm_session") {
+					let userId = 1*value.split(":")[1];
+					let user = Dbm.getInstance().repository.getItem("graphDatabase").controller.getUser(userId);
+	
+					let isValidSession = await user.verifySession(value);
+
+					if(isValidSession) {
+						let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
+						
+						let user = database.getUser(userId);
+						this.item.setValue("user", user);
+					}
+					break;
+				}
+			}
+		}
+
+		this.item.setValue("hasLoadedUser", true);
+	}
+
+	async getUser() {
+		if(!this.item.hasLoadedUser) {
+			await this._loadUser();
+		}
+
+		return this.item.user;
+	}
+
+	async requireRole(aRole) {
+		let user = await this.getUser();
+
+		if(!user) {
+			throw("Only signed in users can use this endpoint");
+		}
+
+		return true;
 	}
 }
