@@ -33,6 +33,12 @@ let fullSelectSetup = function() {
         let currentSelect = new DbmGraphApi.range.select.IncludePrivate();
         currentSelect.item.register(selectPrefix + name);
     }
+
+    {
+        let name = "includeDraft";
+        let currentSelect = new DbmGraphApi.range.select.IncludeDraft();
+        currentSelect.item.register(selectPrefix + name);
+    }
 }
 
 export {fullSelectSetup};
@@ -112,6 +118,13 @@ let fullEncodeSetup = function() {
     {
         let name = "image";
         let currentEncode = new DbmGraphApi.range.encode.Image();
+        currentEncode.item.register(encodePrefix + name);
+        currentEncode.item.setValue("encodingType", name);
+    }
+
+    {
+        let name = "visibility";
+        let currentEncode = new DbmGraphApi.range.encode.Visibility();
         currentEncode.item.register(encodePrefix + name);
         currentEncode.item.setValue("encodingType", name);
     }

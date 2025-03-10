@@ -230,7 +230,7 @@ export default class UrlRequest extends Dbm.core.BaseObject {
 		let user = await this.getUser();
 
 		if(!user) {
-			throw("Only signed in users can use this endpoint");
+			throw(new Error("Only signed in users can use this endpoint"));
 		}
 
 		return true;

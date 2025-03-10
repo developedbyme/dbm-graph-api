@@ -11,3 +11,4 @@ export {default as Breadcrumb} from "./Breadcrumb.js";
 export {default as NavigationName} from "./NavigationName.js";
 export {default as Type} from "./Type.js";
 export {default as Image} from "./Image.js";
+export {default as Visibility} from "./Visibility.js";

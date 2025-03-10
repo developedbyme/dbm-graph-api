@@ -58,56 +58,61 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
                 let ids = [];
                 let logs = [];
 
-                {
-                    let hasSelection = false;
-                    let currentArray = data.select;
-                    let currentArrayLength = currentArray.length;
-                    for(let i = 0; i < currentArrayLength; i++) {
-                        let currentSelectData = currentArray[i];
-                        let currentSelectType = currentSelectData["type"];
-                        let selection = Dbm.getInstance().repository.getItemIfExists("graphApi/range/select/" + currentSelectType);
-                        if(selection) {
-                            hasSelection = true;
-                            await selection.controller.select(selectQuery, currentSelectData, request);
-                        }
-                        else {
-                            logs.push("No selection named " + currentSelectType);
-                        }
-                    }
-
-                    if(hasSelection) {
-                        ids = await selectQuery.getIds();
-    
+                try {
+                    {
+                        let hasSelection = false;
+                        let currentArray = data.select;
+                        let currentArrayLength = currentArray.length;
                         for(let i = 0; i < currentArrayLength; i++) {
                             let currentSelectData = currentArray[i];
                             let currentSelectType = currentSelectData["type"];
                             let selection = Dbm.getInstance().repository.getItemIfExists("graphApi/range/select/" + currentSelectType);
                             if(selection) {
-                                ids = await selection.controller.filter(ids, currentSelectData, request);
+                                hasSelection = true;
+                                await selection.controller.select(selectQuery, currentSelectData, request);
+                            }
+                            else {
+                                logs.push("No selection named " + currentSelectType);
                             }
                         }
-                    }
-                    else {
-                        logs.push("No valid selections");
+    
+                        if(hasSelection) {
+                            ids = await selectQuery.getIds();
+        
+                            for(let i = 0; i < currentArrayLength; i++) {
+                                let currentSelectData = currentArray[i];
+                                let currentSelectType = currentSelectData["type"];
+                                let selection = Dbm.getInstance().repository.getItemIfExists("graphApi/range/select/" + currentSelectType);
+                                if(selection) {
+                                    ids = await selection.controller.filter(ids, currentSelectData, request);
+                                }
+                            }
+                        }
+                        else {
+                            logs.push("No valid selections");
+                        }
+                        
                     }
                     
-                }
-                
-                {
-                    let encodeSession = new DbmGraphApi.range.EncodeSession();
-                    encodeSession.outputController = this;
-
-                    let currentArray = data.encode;
-                    let currentArrayLength = currentArray.length;
-                    for(let i = 0; i < currentArrayLength; i++) {
-                        let currentType = currentArray[i];
-                        
-                        await encodeSession.encode(ids, currentType);
+                    {
+                        let encodeSession = new DbmGraphApi.range.EncodeSession();
+                        encodeSession.outputController = this;
+    
+                        let currentArray = data.encode;
+                        let currentArrayLength = currentArray.length;
+                        for(let i = 0; i < currentArrayLength; i++) {
+                            let currentType = currentArray[i];
+                            
+                            await encodeSession.encode(ids, currentType);
+                        }
+    
+                        encodeSession.destroy();
                     }
-
-                    encodeSession.destroy();
                 }
-                
+                catch(theError) {
+                    logs.push(theError.message);
+                }
+
                 this._webSocket.send(JSON.stringify({"type": "range/response", "ids": ids, "requestId": data["requestId"], "logs": logs}));
                 break;
             case "data":
@@ -216,7 +221,7 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
                     }
                     
                     
-                    this._webSocket.send(JSON.stringify({"type": "item/response", "id": newObject.id, "requestId": data["requestId"]}));
+                    this._webSocket.send(JSON.stringify({"type": "item/response", "id": returnId, "requestId": data["requestId"]}));
                 }
                 break;
             case "admin/editObject":
@@ -320,10 +325,15 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
 
     setInitialUser(aId) {
 
-        let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
+        if(aId) {
+            let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
 
-        let user = database.getUser(aId);
-        this.item.setValue("user", user);
+            let user = database.getUser(aId);
+            this.item.setValue("user", user);
+        }
+        else {
+            this.item.setValue("user", null);
+        }
 
         this._webSocket.send(JSON.stringify({"type": "connectionReady", "user": aId}));
     }
@@ -336,7 +346,7 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
 		let user = await this.getUser();
 
 		if(!user) {
-			throw("Only signed in users can use this endpoint");
+			throw(new Error("Only signed in users can use this endpoint"));
 		}
 
 		return true;
