@@ -138,11 +138,18 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
                     let dataFunctionItem = Dbm.getInstance().repository.getItemIfExists("graphApi/action/" + data['functionName']);
                     
                     let returnData = null;
-                    if(dataFunctionItem) {
-                        returnData = await dataFunctionItem.controller.performAction(data['data'], encodeSession);
+                    let logs = [];
+
+                    try {
+                        if(dataFunctionItem) {
+                            returnData = await dataFunctionItem.controller.performAction(data['data'], encodeSession);
+                        }
+                    }
+                    catch(theError) {
+                        logs.push(theError.message);
                     }
 
-                    this._webSocket.send(JSON.stringify({"type": "data/response", "data": returnData, "requestId": data["requestId"]}));
+                    this._webSocket.send(JSON.stringify({"type": "data/response", "data": returnData, "requestId": data["requestId"], "logs": logs}));
                 }
                 break;
             case "item":
