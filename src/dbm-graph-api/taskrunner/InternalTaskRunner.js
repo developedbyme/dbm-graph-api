@@ -21,7 +21,7 @@ export default class InternalTaskRunner extends Dbm.core.BaseObject {
     }
 
     startAtStartup() {
-        console.log("startAtStartup");
+        //console.log("startAtStartup");
         if(!this._isRunning) {
             this._isRunning = true;
             setTimeout(this._runNextTaskBound, this._timeBetween*1000);
@@ -29,7 +29,7 @@ export default class InternalTaskRunner extends Dbm.core.BaseObject {
     }
 
     async _runNextTask() {
-        console.log("_runNextTask");
+        //console.log("_runNextTask");
 
         let runDirect = false;
 
@@ -39,8 +39,6 @@ export default class InternalTaskRunner extends Dbm.core.BaseObject {
     
             let dataFunctionItem = Dbm.getInstance().repository.getItemIfExists("graphApi/action/cron/processActions");
             let returnData = await dataFunctionItem.controller.performAction({}, encodeSession);
-            
-            console.log(returnData);
 
             if(returnData.remaining > 0) {
                 runDirect = true
