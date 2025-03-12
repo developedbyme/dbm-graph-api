@@ -186,7 +186,10 @@ let setupInternalTaskRunner = function() {
     let runner = new DbmGraphApi.taskrunner.InternalTaskRunner();
     runner.startAtStartup();
 
-    Dbm.getInstance().repository.getItem("taskRunner").runners.push(runner);
+    let runners = [].concat(Dbm.getInstance().repository.getItem("taskRunner").runners);
+    runners.push(runner);
+    Dbm.getInstance().repository.getItem("taskRunner").runners = runners; 
+    
 }
 
 export {setupInternalTaskRunner};
