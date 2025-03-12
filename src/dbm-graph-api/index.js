@@ -6,6 +6,10 @@ import DbmGraphApi from "../../index.js";
 import Api from "./Api.js";
 import UrlRequest from "./UrlRequest.js";
 
+import fs from "node:fs";
+import sharp from 'sharp';
+import mime from 'mime';
+
 export {Api};
 
 export * as range from "./range/index.js";
@@ -209,7 +213,7 @@ let fullSetup = function() {
 
 export {fullSetup};
 
-let setupEndpoints = function(aServer) {
+export const setupEndpoints = function(aServer) {
     aServer.post('/api/user/login', async function handler (aRequest, aReply) {
 
 		let username = aRequest.body['username'];
@@ -416,4 +420,265 @@ let setupEndpoints = function(aServer) {
 	});
 }
 
-export {setupEndpoints};
+export const setupSite = function(aServer) {
+
+    aServer.get('/cdn-cgi/image/:options/*', async function(request, reply) {
+        console.log("/cdn-cgi/image/");
+
+        let publicDir = Dbm.getInstance().repository.getItem("site").publicDir;
+
+		let nextPosition = request.url.indexOf('/', "/cdn-cgi/image/".length);
+		let imageUrl = request.url.substring(nextPosition+1);
+
+		let realPath;
+		try {
+			realPath = fs.realpathSync(publicDir + "/" + imageUrl);
+            console.log(realPath);
+			console.log(realPath);
+			if(realPath.indexOf(publicDir + "/") !== 0) {
+				throw("Not in folder");
+			}
+
+			if(!fs.lstatSync(realPath).isFile()) {
+				throw("Not a file");
+			}
+		}
+		catch(theError) {
+			reply.code(404);
+			return;
+		}
+		
+		let imageResize = sharp(realPath);
+		
+		let options = {
+			background: {r: 0, g: 0, b: 0, alpha: 0}
+		};
+		let currentArray = request.params.options.split(",");
+		let currentArrayLength = currentArray.length;
+		for(let i = 0; i < currentArrayLength; i++) {
+			let tempArray = currentArray[i].split("=");
+			let name = tempArray[0];
+			switch(name) {
+				case "width":
+				case "height":
+					options[name] = 1*tempArray[1];
+					break;
+				default:
+					options[name] = tempArray[1];
+			}
+			
+		}
+
+		imageResize.resize(options);
+		
+		let image = await imageResize.toBuffer();
+		reply.header('Content-Type', mime.getType(realPath));
+		reply.send(image);
+	});
+
+    aServer.get('/sitemap.xml', async function(request, reply) {
+
+        let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
+		
+		reply.header("Content-Type", "application/xml; charset=utf-8");
+		
+		let response = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+		
+		let pages = await database.getObjectsOfType("page");
+		
+		let fullUrl = request.protocol + "://" + request.hostname;
+		if(request.port && request.port !== 80 && request.port !== 443) {
+			fullUrl += ":" + request.port;
+		}
+		
+		let currentArray = pages;
+		let currentArrayLength = currentArray.length;
+		for(let i = 0; i < currentArrayLength; i++) {
+			let databaseObject = currentArray[i];
+			let url = await databaseObject.getUrl();
+			if(url) {
+				let fields = await databaseObject.getFields();
+				
+				response += '  <url>\n';
+				response += '    <loc>' + fullUrl + url + '</loc>\n';
+				if(fields["lastModified"]) {
+					response += '    <lastmod>' + fields["lastModified"] + '</lastmod>\n';
+				}
+				response += '  </url>\n';
+			}
+		}
+		
+		response += '</urlset>';
+		
+		return response;
+	});
+
+	aServer.get('/robots.txt', async function(request, reply) {
+		reply.header("Content-Type", "text/plain; charset=utf-8");
+		return "User-agent: *\nDisallow:"
+	});
+
+    aServer.get('/*', async function(request, reply) {
+		let site = Dbm.getInstance().repository.getItem("site");
+        let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
+
+        let version = site.version;
+		let assetsUri = site.assetsUri;
+		let language = site.language;
+		let siteName = site.name;
+		let loader = "loader.js?version=" + site.version;
+		if((process.env.NODE_ENV === "production" && request.query.forceLoad !== "unminified") || request.query.forceLoad === "minified") {
+			loader = "loader.min.js?version=" + site.version;
+		}
+
+		let url = request.url;
+		let index = url.indexOf("?");
+		if(index >= 0) {
+			url = url.substring(0, index);
+		}
+		if(url[url.length-1] !== "/") {
+			url += "/";
+		}
+		
+		let urlObject = await database.getObjectByUrl(url);
+		let moduleName = site.moduleName;
+		if(request.query.forceModule) {
+			moduleName = request.query.forceModule;
+		}
+
+		if(!urlObject) {
+			reply.code(404);
+			reply.type('text/html');
+
+			let returnString = `
+				<!doctype html>
+				<html lang="${language}">
+				<head>
+				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+				<title>Page not found - ${siteName}</title>`;
+
+                {
+                    let currentArray = site.preconnectUrls;
+                    let currentArrayLength =currentArray.length;
+                    for(let i = 0; i < currentArrayLength; i++) {
+                        returnString += `<link rel="preconnect" href="${currentArray[i]}" crossorigin>`;
+                    }
+                }
+
+				returnString += `<link rel="preconnect" href="${process.env.S3_BUCKET_PUBLIC_PATH}" crossorigin>
+				<!-- Google Tag Manager -->
+				<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+				new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+				j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+				'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+				})(window,document,'script','dataLayer','GTM-K8BL9Q5S');</script>
+				<!-- End Google Tag Manager -->
+				<link rel="stylesheet" type="text/css" href="${assetsUri}css/main.css?version=${version}" />
+				<meta name="viewport" content="initial-scale=1,user-scalable=yes" />
+				<meta name="HandheldFriendly" content="true" />
+				<link rel="icon" type="image/png" href="${assetsUri}img/favicon.png">
+				</head>
+				<body>
+				<div id="site"></div>
+				<script>
+				(function(d,b,m,j,s){
+						d[m] = d[m] || {}; d[m][j] = d[m][j] || {_: [], create: function(element, moduleName, data) {return this._.push({element, moduleName, data});}, remove: function(id) {this._[id-1] = null;}};
+						let e = b.createElement("script"); e.async = true; e.src = s; b.head.appendChild(e);
+					})(window, document, "dbmstartup", "modules", "${assetsUri}js/${loader}");
+				
+					dbmstartup.modules.create(document.getElementById("site"), "${moduleName}", {});
+				</script>
+				</body>
+				</html>
+			`;
+
+            return returnString;
+		}
+
+		reply.code(200);
+		reply.type('text/html');
+
+		let fields = await urlObject.getFields();
+
+		let returnString = `
+		<!doctype html>
+		<html lang="${language}">
+		<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="viewport" content="initial-scale=1,user-scalable=yes" />
+		<meta name="HandheldFriendly" content="true" />
+
+        `;
+		{
+            let currentArray = site.preconnectUrls;
+            let currentArrayLength =currentArray.length;
+            for(let i = 0; i < currentArrayLength; i++) {
+                returnString += `<link rel="preconnect" href="${currentArray[i]}" crossorigin>`;
+            }
+        }
+            
+        returnString += `<title>${fields.title} - ${siteName}</title>
+
+		<meta property="og:type" content="website" />
+		<meta property="og:locale" content="${language}" />
+		<meta property="og:site_name" content="${siteName}" />
+		<meta property="og:title" content="${fields.title}" />
+
+		<!-- Google Tag Manager -->
+		<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+		new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+		j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+		'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+		})(window,document,'script','dataLayer','GTM-K8BL9Q5S');</script>
+		<!-- End Google Tag Manager -->
+		
+		<link rel="stylesheet" type="text/css" href="${assetsUri}css/main.css?version=${version}" />
+		
+		<link rel="icon" type="image/png" href="${assetsUri}img/favicon.png">`;
+
+		if(fields['meta/description']) {
+			returnString += `
+				<meta name="description" content="${fields['meta/description']}" />
+				<meta property="og:description" content="${fields['meta/description']}" />
+			`;
+		}
+
+		let fullUrl = request.protocol + "://" + request.hostname;
+		if(request.port && request.port !== 80 && request.port !== 443) {
+			fullUrl += ":" + request.port;
+		}
+		fullUrl += url;
+
+		returnString += `
+			<link rel="canonical" href="${fullUrl}" />
+			<meta property="og:url" content="${fullUrl}" />
+		`;
+
+		/*
+	<meta property="article:publisher" content="https://sv-se.facebook.com/..." />
+	<meta property="article:modified_time" content="2024-09-03T13:19:26+00:00" />
+
+	<meta property="og:image" content="https://..." />
+	<meta property="og:image:width" content="1024" />
+	<meta property="og:image:height" content="683" />
+	<meta property="og:image:type" content="image/jpeg" />
+	<meta name="twitter:card" content="summary_large_image" />
+	*/
+
+		returnString += `</head>
+		<body>
+		<div id="site"></div>
+		<script>
+		(function(d,b,m,j,s){
+				d[m] = d[m] || {}; d[m][j] = d[m][j] || {_: [], create: function(element, moduleName, data) {return this._.push({element, moduleName, data});}, remove: function(id) {this._[id-1] = null;}};
+				let e = b.createElement("script"); e.async = true; e.src = s; b.head.appendChild(e);
+			})(window, document, "dbmstartup", "modules", "${assetsUri}js/${loader}");
+		
+			dbmstartup.modules.create(document.getElementById("site"), "${moduleName}", {});
+		</script>
+		</body>
+		</html>`;
+
+		return returnString;
+	});
+}
