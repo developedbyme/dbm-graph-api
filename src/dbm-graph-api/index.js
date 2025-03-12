@@ -13,6 +13,7 @@ export * as admin from "./admin/index.js";
 export * as data from "./data/index.js";
 export * as action from "./action/index.js";
 export * as processAction from "./processAction/index.js";
+export * as taskrunner from "./taskrunner/index.js";
 
 let fullSelectSetup = function() {
     let selectPrefix = "graphApi/range/select/";
@@ -179,13 +180,26 @@ let fullProcessActionSetup = function() {
 
 export {fullProcessActionSetup};
 
+let setupInternalTaskRunner = function() {
+    Dbm.getInstance().repository.getItem("taskRunner").requireProperty("runners", []);
+
+    let runner = new DbmGraphApi.taskrunner.InternalTaskRunner();
+    runner.startAtStartup();
+
+    Dbm.getInstance().repository.getItem("taskRunner").runners.push(runner);
+}
+
+export {setupInternalTaskRunner};
+
+
 let fullSetup = function() {
 
     fullSelectSetup();
     fullEncodeSetup();
     fullDataSetup();
     fullActionSetup();
-    fullProcessActionSetup()
+    fullProcessActionSetup();
+    setupInternalTaskRunner();
     
     DbmGraphApi.admin.edit.fullSetup();
 }
