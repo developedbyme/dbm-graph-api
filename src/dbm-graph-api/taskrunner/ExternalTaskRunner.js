@@ -10,6 +10,7 @@ export default class ExternalTaskRunner extends Dbm.core.BaseObject {
         this._intervalId = -1;
         this._timeBetween = 5;
 
+        this.item.requireProperty("name", "Unnamed task");
         this.item.requireProperty("url", null);
         this.item.requireProperty("method", "GET");
         this.item.requireProperty("headers", {});
@@ -28,7 +29,7 @@ export default class ExternalTaskRunner extends Dbm.core.BaseObject {
     }
 
     async _runNextTask() {
-        console.log("_runNextTask");
+        //console.log("_runNextTask");
 
         let runDirect = false;
 
@@ -47,7 +48,7 @@ export default class ExternalTaskRunner extends Dbm.core.BaseObject {
             let data = await response.json();
 
             let continueData = Dbm.objectPath(data, this.item.continueField);
-            console.log(continueData);
+            console.log(this.item.name + " " + continueData);
 
             if(continueData > 0) {
                 runDirect = true;
