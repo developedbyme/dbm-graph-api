@@ -565,7 +565,9 @@ export const setupSite = function(aServer) {
                     }
                 }
 
-				returnString += `<link rel="preconnect" href="${process.env.S3_BUCKET_PUBLIC_PATH}" crossorigin>`;
+                if(site.disableSearchEngines) {
+                    returnString += `<meta name="robots" content="noindex, nofollow" />`;
+                }
 
                 {
                     let currentArray = site.injectCodeSnippets;
@@ -611,12 +613,29 @@ export const setupSite = function(aServer) {
 		<meta name="HandheldFriendly" content="true" />
 
         `;
+
 		{
             let currentArray = site.preconnectUrls;
             let currentArrayLength =currentArray.length;
             for(let i = 0; i < currentArrayLength; i++) {
                 returnString += `<link rel="preconnect" href="${currentArray[i]}" crossorigin>`;
             }
+        }
+
+        if(site.disableSearchEngines) {
+            returnString += `<meta name="robots" content="noindex, nofollow" />`;
+        }
+        else {
+            let robotsSettings = ["index", "follow"];
+            if(fields["seo/noIndex"]) {
+                robotsSettings[0] = "noindex";
+            }
+            if(fields["seo/nofollow"]) {
+                robotsSettings[1] = "nofollow";
+            }
+
+            let content = robotsSettings.join(", ");
+            returnString += `<meta name="robots" content="${content}" />`;
         }
             
         returnString += `<title>${fields.title} - ${siteName}</title>
