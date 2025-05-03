@@ -23,7 +23,7 @@ export default class ProcessActions extends Dbm.core.BaseObject {
             let actionType = await (await action.singleObjectRelationQuery("in:for:type/actionType")).getIdentifier();
             console.log(actionType);
             
-            let processActionItem = Dbm.getInstance().repository.getItemIfExists("graphApi/procesAction/" + actionType);
+            let processActionItem = Dbm.getInstance().repository.getItemIfExists("graphApi/processAction/" + actionType);
 
             if(processActionItem) {
 

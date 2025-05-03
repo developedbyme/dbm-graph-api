@@ -133,6 +133,13 @@ let fullEncodeSetup = function() {
         currentEncode.item.register(encodePrefix + name);
         currentEncode.item.setValue("encodingType", name);
     }
+
+    {
+        let name = "relations";
+        let currentEncode = new DbmGraphApi.range.encode.Relations();
+        currentEncode.item.register(encodePrefix + name);
+        currentEncode.item.setValue("encodingType", name);
+    }
 }
 
 export {fullEncodeSetup};
@@ -166,6 +173,7 @@ let fullActionSetup = function() {
     registerActionFunction("example", new DbmGraphApi.action.Example());
     registerActionFunction("incomingWebhook", new DbmGraphApi.action.IncomingWebhook());
     registerActionFunction("cron/processActions", new DbmGraphApi.action.cron.ProcessActions());
+    registerActionFunction("admin/addAndProcessAction", new DbmGraphApi.action.admin.AddAndProcessAction());
 }
 
 export {fullActionSetup};
