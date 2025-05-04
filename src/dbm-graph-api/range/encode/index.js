@@ -13,3 +13,6 @@ export {default as Type} from "./Type.js";
 export {default as Image} from "./Image.js";
 export {default as Visibility} from "./Visibility.js";
 export {default as Relations} from "./Relations.js";
+export {default as ObjectTypes} from "./ObjectTypes.js";
+export {default as RepresentingPage} from "./RepresentingPage.js";
+export {default as PageRepresentation} from "./PageRepresentation.js";

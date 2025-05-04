@@ -140,6 +140,27 @@ let fullEncodeSetup = function() {
         currentEncode.item.register(encodePrefix + name);
         currentEncode.item.setValue("encodingType", name);
     }
+
+    {
+        let name = "objectTypes";
+        let currentEncode = new DbmGraphApi.range.encode.ObjectTypes();
+        currentEncode.item.register(encodePrefix + name);
+        currentEncode.item.setValue("encodingType", name);
+    }
+
+    {
+        let name = "representingPage";
+        let currentEncode = new DbmGraphApi.range.encode.RepresentingPage();
+        currentEncode.item.register(encodePrefix + name);
+        currentEncode.item.setValue("encodingType", name);
+    }
+
+    {
+        let name = "pageRepresentation";
+        let currentEncode = new DbmGraphApi.range.encode.PageRepresentation();
+        currentEncode.item.register(encodePrefix + name);
+        currentEncode.item.setValue("encodingType", name);
+    }
 }
 
 export {fullEncodeSetup};

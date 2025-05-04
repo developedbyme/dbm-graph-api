@@ -9,7 +9,7 @@ export default class AddAndProcessAction extends Dbm.core.BaseObject {
         let returnObject = {};
 
         let user = await aEncodeSession.outputController.getUser();
-        console.log(user);
+        
         if(user) {
             let type = aData["type"];
 
@@ -30,7 +30,6 @@ export default class AddAndProcessAction extends Dbm.core.BaseObject {
                 await action.replaceIncomingRelation(processingActionStatus, "for", "status/actionStatus");
     
                 let processActionItem = Dbm.getInstance().repository.getItemIfExists("graphApi/processAction/" + type);
-                console.log(processActionItem);
     
                 if(processActionItem) {
     

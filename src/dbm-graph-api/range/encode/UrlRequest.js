@@ -17,6 +17,7 @@ export default class UrlRequest extends EncodeBaseObject {
         await aEncodingSession.encodeSingle(aId, "content");
         await aEncodingSession.encodeSingle(aId, "url");
         await aEncodingSession.encodeSingle(aId, "navigationName");
+        await aEncodingSession.encodeSingle(aId, "pageRepresentation");
 
         let fields = await object.getFields();
         returnObject["meta/description"] = fields["meta/description"] ? fields["meta/description"] : null;
