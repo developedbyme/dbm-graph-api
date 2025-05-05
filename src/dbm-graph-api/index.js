@@ -44,6 +44,12 @@ let fullSelectSetup = function() {
         let currentSelect = new DbmGraphApi.range.select.IncludeDraft();
         currentSelect.item.register(selectPrefix + name);
     }
+
+    {
+        let name = "objectRelationQuery";
+        let currentSelect = new DbmGraphApi.range.select.ObjectRelationQuery();
+        currentSelect.item.register(selectPrefix + name);
+    }
 }
 
 export {fullSelectSetup};

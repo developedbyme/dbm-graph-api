@@ -111,6 +111,7 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
                 }
                 catch(theError) {
                     logs.push(theError.message);
+                    console.error(theError);
                 }
 
                 this._webSocket.send(JSON.stringify({"type": "range/response", "ids": ids, "requestId": data["requestId"], "logs": logs}));
@@ -147,6 +148,7 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
                     }
                     catch(theError) {
                         logs.push(theError.message);
+                        console.error(theError);
                     }
 
                     this._webSocket.send(JSON.stringify({"type": "data/response", "data": returnData, "requestId": data["requestId"], "logs": logs}));
