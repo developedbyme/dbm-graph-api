@@ -181,6 +181,9 @@ export let registerDataFunction = function(aName, aDataFunction) {
 
 let fullDataSetup = function() {
     registerDataFunction("example", new DbmGraphApi.data.Example());
+
+    registerDataFunction("breadcrumb", new DbmGraphApi.data.Breadcrumb());
+
     registerDataFunction("admin/freeUrl", new DbmGraphApi.data.FreeUrl());
     registerDataFunction("admin/seoSummary", new DbmGraphApi.data.SeoSummary());
     registerDataFunction("admin/altText", new DbmGraphApi.data.AltText());
