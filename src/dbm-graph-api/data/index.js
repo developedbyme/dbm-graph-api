@@ -5,6 +5,8 @@ export {default as SeoSummary} from "./SeoSummary.js";
 export {default as AltText} from "./AltText.js";
 export {default as Breadcrumb} from "./Breadcrumb.js";
 
+export * as server from "./server/index.js";
+
 import UploadS3 from "./UploadS3.js";
 
 import { S3Client } from "@aws-sdk/client-s3";

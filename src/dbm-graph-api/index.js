@@ -187,6 +187,8 @@ let fullDataSetup = function() {
     registerDataFunction("admin/freeUrl", new DbmGraphApi.data.FreeUrl());
     registerDataFunction("admin/seoSummary", new DbmGraphApi.data.SeoSummary());
     registerDataFunction("admin/altText", new DbmGraphApi.data.AltText());
+
+    registerDataFunction("server/status", new DbmGraphApi.data.server.Status());
 }
 
 export {fullDataSetup};
@@ -204,6 +206,9 @@ let fullActionSetup = function() {
     registerActionFunction("incomingWebhook", new DbmGraphApi.action.IncomingWebhook());
     registerActionFunction("cron/processActions", new DbmGraphApi.action.cron.ProcessActions());
     registerActionFunction("admin/addAndProcessAction", new DbmGraphApi.action.admin.AddAndProcessAction());
+
+    registerActionFunction("development/restartServer", new DbmGraphApi.action.development.RestartServer());
+    registerActionFunction("development/restartDatabaseConnection", new DbmGraphApi.action.development.RestartDatabaseConnection());
 }
 
 export {fullActionSetup};
