@@ -18,6 +18,7 @@ export * as data from "./data/index.js";
 export * as action from "./action/index.js";
 export * as processAction from "./processAction/index.js";
 export * as taskrunner from "./taskrunner/index.js";
+export * as schema from "./schema/index.js";
 
 let fullSelectSetup = function() {
     let selectPrefix = "graphApi/range/select/";
@@ -206,6 +207,8 @@ let fullActionSetup = function() {
     registerActionFunction("incomingWebhook", new DbmGraphApi.action.IncomingWebhook());
     registerActionFunction("cron/processActions", new DbmGraphApi.action.cron.ProcessActions());
     registerActionFunction("admin/addAndProcessAction", new DbmGraphApi.action.admin.AddAndProcessAction());
+
+    registerActionFunction("admin/setup/setupWebsite", new DbmGraphApi.action.admin.setup.SetupWebsite());
 
     registerActionFunction("development/restartServer", new DbmGraphApi.action.development.RestartServer());
     registerActionFunction("development/restartDatabaseConnection", new DbmGraphApi.action.development.RestartDatabaseConnection());
@@ -673,13 +676,31 @@ export const setupSite = function(aServer) {
             if(fields["seo/noIndex"]) {
                 robotsSettings[0] = "noindex";
             }
-            if(fields["seo/nofollow"]) {
+            if(fields["seo/noFollow"]) {
                 robotsSettings[1] = "nofollow";
             }
 
             let content = robotsSettings.join(", ");
             returnString += `<meta name="robots" content="${content}" />`;
         }
+
+        let baseUrl = request.protocol + "://" + request.hostname;
+		if(request.port && request.port !== 80 && request.port !== 443) {
+			baseUrl += ":" + request.port;
+		}
+
+        let schemaGenrator = new DbmGraphApi.schema.JsonLdGenerator();
+        schemaGenrator.baseUrl = baseUrl;
+        let schemaMarkup = await schemaGenrator.getWebsiteEntites();
+        schemaMarkup = schemaMarkup.concat(await schemaGenrator.getPageEntites(urlObject))
+        let encodedMarkup = JSON.stringify(schemaMarkup, null, 2);
+
+        returnString += `<script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@graph": ${encodedMarkup}
+        }
+        </script>`;
             
         returnString += `<title>${fields.title} - ${siteName}</title>
 
@@ -707,11 +728,7 @@ export const setupSite = function(aServer) {
 			`;
 		}
 
-		let fullUrl = request.protocol + "://" + request.hostname;
-		if(request.port && request.port !== 80 && request.port !== 443) {
-			fullUrl += ":" + request.port;
-		}
-		fullUrl += url;
+		let fullUrl = baseUrl + url;
 
 		returnString += `
 			<link rel="canonical" href="${fullUrl}" />
