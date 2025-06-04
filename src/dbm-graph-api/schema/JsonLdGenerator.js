@@ -13,12 +13,13 @@ export default class JsonLdGenerator extends Dbm.core.BaseObject{
         console.log("encodeWebsiteEntity");
 
         let site = Dbm.getInstance().repository.getItem("site");
+        let fields = await aDatabaseObject.getFields();
     
         return {
             "@type": "WebSite",
             "@id": this.baseUrl + "/" + "#website",
             "url": this.baseUrl + "/",
-            "name": site.name,
+            "name": fields["name"] ? fields["name"] : site.name,
             "publisher": {
                 "@id": this.baseUrl + "/" + "#organization"
             }
@@ -29,15 +30,70 @@ export default class JsonLdGenerator extends Dbm.core.BaseObject{
         console.log("encodeOrganizationEntity");
 
         let site = Dbm.getInstance().repository.getItem("site");
+        let fields = await aDatabaseObject.getFields();
     
         return {
             "@type": "Organization",
             "@id": this.baseUrl + "/" + "#organization",
             "url": this.baseUrl + "/",
-            "name": site.name,
+            "name": fields["name"] ? fields["name"] : site.name,
         };
 
         //Logo
+    }
+
+    async encodeLocalBusiness(aDatabaseObject) {
+
+        let site = Dbm.getInstance().repository.getItem("site");
+
+        let type = await aDatabaseObject.singleObjectRelationQuery("in:for:schema/type");
+        let typeName = await type.getIdentifier();
+        let fields = await aDatabaseObject.getFields();
+
+        let returnObject = {
+            "@type": typeName,
+            "@id": this.baseUrl + "/" + "#local-business",
+            "url": this.baseUrl + "/",
+            "name": fields["name"] ? fields["name"] : site.name,
+            "telephone": fields["phoneNumber"],
+            "email": fields["email"],
+            "priceRange": fields["priceRangeDescription"],
+            "parentOrganization": {
+                "@id": this.baseUrl + "/" + "#organization"
+            }
+        };
+
+        if(fields["rating/value"]) {
+            returnObject["aggregateRating"] = {
+                "@type": "AggregateRating",
+                "ratingValue": fields["rating/value"],
+                "reviewCount": fields["rating/count"],
+                "bestRating": fields["rating/max"] ? fields["rating/max"] : "5",
+                "worstRating": fields["rating/min"] ? fields["rating/min"] : "1",
+              }
+        }
+
+        let location = await aDatabaseObject.singleObjectRelationQuery("out:at:location");
+
+        if(location) {
+            let fields =  await location.getFields();
+
+            returnObject["address"] = {
+                "@type": "PostalAddress",
+                "streetAddress": fields["street"],
+                "addressLocality": fields["city"],
+                "postalCode": fields["postCode"],
+                "addressCountry": fields["country"]
+            },
+
+            returnObject["geo"] = {
+                "@type": "GeoCoordinates",
+                "latitude": fields["latitude"],
+                "longitude": fields["longitude"]
+            };
+        }
+
+        return returnObject;
     }
     
     async getWebsiteEntites() {
@@ -46,16 +102,20 @@ export default class JsonLdGenerator extends Dbm.core.BaseObject{
         let returnArray = [];
         let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
     
-        let globalObject = await database.getIdentifiableObjectIfExists("globalObject", "website");
-        if(globalObject) {
-            let website = globalObject.singleObjectRelationQuery("out:pointingTo:*");
-            if(website) {
-                returnArray.push(await this.encodeWebsiteEntity(website));
-                returnArray.push(await this.encodeOrganizationEntity(website));
+        let website = await database.getGlobalObject("website");
+        if(website) {
+            returnArray.push(await this.encodeWebsiteEntity(website));
+
+            let organization = await website.singleObjectRelationQuery("out:by:organization");
+            returnArray.push(await this.encodeOrganizationEntity(organization));
+
+            let currentArray = await website.objectRelationQuery("out:by:organization,in:in:localBusiness");
+            let currentArrayLength = currentArray.length;
+            for(let i = 0; i < currentArrayLength; i++) {
+                let currentLocalBusiness = currentArray[i];
+                returnArray.push(await this.encodeLocalBusiness(currentLocalBusiness));
             }
         }
-    
-        console.log(returnArray);
     
         return returnArray;
     }
@@ -84,7 +144,6 @@ export default class JsonLdGenerator extends Dbm.core.BaseObject{
           returnArray.push(pageObject);
 
           let urlParts = url.split("/");
-          console.log(urlParts);
           urlParts.pop();
 
           let breadcrumbItems = [];
@@ -96,7 +155,6 @@ export default class JsonLdGenerator extends Dbm.core.BaseObject{
             let currentPart = currentArray[i];
             currentUrl += currentPart + "/";
             let urlObject = await database.getObjectByUrl(currentUrl);
-            console.log(urlObject, currentUrl);
             if(urlObject) {
                 let urlObjectFields = await urlObject.getFields();
                 let encodedStep = {

@@ -16,3 +16,5 @@ export {default as Relations} from "./Relations.js";
 export {default as ObjectTypes} from "./ObjectTypes.js";
 export {default as RepresentingPage} from "./RepresentingPage.js";
 export {default as PageRepresentation} from "./PageRepresentation.js";
+
+export * as admin from "./admin/index.js";

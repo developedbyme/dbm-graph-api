@@ -21,6 +21,8 @@ export default class UrlRequest extends EncodeBaseObject {
 
         let fields = await object.getFields();
         returnObject["meta/description"] = fields["meta/description"] ? fields["meta/description"] : null;
+        returnObject["seo/noIndex"] = fields["seo/noIndex"] ? fields["seo/noIndex"] : false;
+        returnObject["seo/noFollow"] = fields["seo/noFollow"] ? fields["seo/noFollow"] : false;
 
         return returnObject;
     }

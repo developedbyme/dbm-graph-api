@@ -51,6 +51,12 @@ let fullSelectSetup = function() {
         let currentSelect = new DbmGraphApi.range.select.ObjectRelationQuery();
         currentSelect.item.register(selectPrefix + name);
     }
+
+    {
+        let name = "globalObjectRelationQuery";
+        let currentSelect = new DbmGraphApi.range.select.GlobalObjectRelationQuery();
+        currentSelect.item.register(selectPrefix + name);
+    }
 }
 
 export {fullSelectSetup};
@@ -168,6 +174,13 @@ let fullEncodeSetup = function() {
         currentEncode.item.register(encodePrefix + name);
         currentEncode.item.setValue("encodingType", name);
     }
+
+    {
+        let name = "admin_fields";
+        let currentEncode = new DbmGraphApi.range.encode.admin.Fields();
+        currentEncode.item.register(encodePrefix + name);
+        currentEncode.item.setValue("encodingType", name);
+    }
 }
 
 export {fullEncodeSetup};
@@ -209,6 +222,7 @@ let fullActionSetup = function() {
     registerActionFunction("admin/addAndProcessAction", new DbmGraphApi.action.admin.AddAndProcessAction());
 
     registerActionFunction("admin/setup/setupWebsite", new DbmGraphApi.action.admin.setup.SetupWebsite());
+    registerActionFunction("admin/setup/setupOrganization", new DbmGraphApi.action.admin.setup.SetupOrganization());
 
     registerActionFunction("development/restartServer", new DbmGraphApi.action.development.RestartServer());
     registerActionFunction("development/restartDatabaseConnection", new DbmGraphApi.action.development.RestartDatabaseConnection());
@@ -544,6 +558,10 @@ export const setupSite = function(aServer) {
 			let url = await databaseObject.getUrl();
 			if(url) {
 				let fields = await databaseObject.getFields();
+
+                if(fields["seo/noIndex"]) {
+                    continue;
+                }
 				
 				response += '  <url>\n';
 				response += '    <loc>' + fullUrl + url + '</loc>\n';
