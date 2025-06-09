@@ -4,6 +4,7 @@ export {default as FreeUrl} from "./FreeUrl.js";
 export {default as SeoSummary} from "./SeoSummary.js";
 export {default as AltText} from "./AltText.js";
 export {default as Breadcrumb} from "./Breadcrumb.js";
+export {default as Question} from "./Question.js";
 
 export * as server from "./server/index.js";
 

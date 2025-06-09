@@ -181,6 +181,13 @@ let fullEncodeSetup = function() {
         currentEncode.item.register(encodePrefix + name);
         currentEncode.item.setValue("encodingType", name);
     }
+
+    {
+        let name = "helpSection";
+        let currentEncode = new DbmGraphApi.range.encode.HelpSection();
+        currentEncode.item.register(encodePrefix + name);
+        currentEncode.item.setValue("encodingType", name);
+    }
 }
 
 export {fullEncodeSetup};
@@ -197,6 +204,7 @@ let fullDataSetup = function() {
     registerDataFunction("example", new DbmGraphApi.data.Example());
 
     registerDataFunction("breadcrumb", new DbmGraphApi.data.Breadcrumb());
+    registerDataFunction("question", new DbmGraphApi.data.Question());
 
     registerDataFunction("admin/freeUrl", new DbmGraphApi.data.FreeUrl());
     registerDataFunction("admin/seoSummary", new DbmGraphApi.data.SeoSummary());
