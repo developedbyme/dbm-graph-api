@@ -208,6 +208,7 @@ let fullDataSetup = function() {
 
     registerDataFunction("admin/freeUrl", new DbmGraphApi.data.FreeUrl());
     registerDataFunction("admin/seoSummary", new DbmGraphApi.data.SeoSummary());
+    registerDataFunction("admin/helpSectionSuggestions", new DbmGraphApi.data.HelpSectionSuggestions());
     registerDataFunction("admin/altText", new DbmGraphApi.data.AltText());
 
     registerDataFunction("server/status", new DbmGraphApi.data.server.Status());
