@@ -107,13 +107,15 @@ export default class JsonLdGenerator extends Dbm.core.BaseObject{
             returnArray.push(await this.encodeWebsiteEntity(website));
 
             let organization = await website.singleObjectRelationQuery("out:by:organization");
-            returnArray.push(await this.encodeOrganizationEntity(organization));
+            if(organization) {
+                returnArray.push(await this.encodeOrganizationEntity(organization));
 
-            let currentArray = await website.objectRelationQuery("out:by:organization,in:in:localBusiness");
-            let currentArrayLength = currentArray.length;
-            for(let i = 0; i < currentArrayLength; i++) {
-                let currentLocalBusiness = currentArray[i];
-                returnArray.push(await this.encodeLocalBusiness(currentLocalBusiness));
+                let currentArray = await website.objectRelationQuery("out:by:organization,in:in:localBusiness");
+                let currentArrayLength = currentArray.length;
+                for(let i = 0; i < currentArrayLength; i++) {
+                    let currentLocalBusiness = currentArray[i];
+                    returnArray.push(await this.encodeLocalBusiness(currentLocalBusiness));
+                }
             }
         }
     

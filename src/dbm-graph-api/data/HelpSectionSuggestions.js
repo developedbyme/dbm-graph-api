@@ -23,22 +23,22 @@ export default class HelpSectionSuggestions extends Dbm.core.BaseObject {
             "All about this section"
         ];
 
-        let alreadyAddedString = "The page already have these titles: " + JSON.stringify(alreadyAdded);
+        let alreadyAddedString = "The page already have these faq sections: " + JSON.stringify(alreadyAdded);
 
-        let contentString = "Content of the page: " + JSON.stringify(content);
+        let contentString = JSON.stringify(content);
 
-        let instructions = "Analyze the content and generate a list of questions and link titles that this page answers. Do the link titles as a call to action. {additionalInstructions} Respond with only a json object {helpSectionTitles: array of {question: string, linkTitle: string}}, no markdown.";
+        let instructions = "Generate a seo description for the page data provided by the user. Split up the description into different lines and only keep the ones that can be used to link to this page. {additionalInstructions} Respond with only a json object {seoDescription: string, linkTitles: array of string}, no markdown.";
         instructions = instructions.split("{data}").join(contentString);
         
         let additionalInstructions = "";
         instructions = instructions.split("{additionalInstructions}").join(additionalInstructions);
 
         let body = {
-            "model": "gpt-4o-mini",
+            "model": "gpt-4o",
             "response_format": { "type": "json_object" },
             "messages": [
                {"role":"system","content": instructions},
-               {"role": "user", "content": alreadyAddedString},
+               /*{"role": "user", "content": alreadyAddedString},*/
                {"role": "user", "content": contentString}
            ],
             "temperature": 0.1
@@ -62,7 +62,7 @@ export default class HelpSectionSuggestions extends Dbm.core.BaseObject {
         let responseContent = JSON.parse(message.content);
         console.log(responseContent);
         
-        returnObject["titles"] = responseContent["helpSectionTitles"];
+        returnObject["titles"] = responseContent;
         
         return returnObject;
     }

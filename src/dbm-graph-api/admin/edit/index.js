@@ -10,6 +10,8 @@ export {default as AddOutgoingRelation} from "./AddOutgoingRelation.js";
 export {default as ClearCloudflareCache} from "./ClearCloudflareCache.js";
 export {default as ReplaceIncomingRelation} from "./ReplaceIncomingRelation.js";
 export {default as ReplaceOutgoingRelation} from "./ReplaceOutgoingRelation.js";
+export {default as ReplaceMultipleIncomingRelations} from "./ReplaceMultipleIncomingRelations.js";
+export {default as ReplaceMultipleOutgoingRelations} from "./ReplaceMultipleOutgoingRelations.js";
 
 export const fullSetup = function() {
     let prefix = "graphApi/admin/edit/";
@@ -58,6 +60,18 @@ export const fullSetup = function() {
     {
         let name = "replaceOutgoingRelation";
         let currentSelect = new DbmGraphApi.admin.edit.ReplaceOutgoingRelation();
+        currentSelect.item.register(prefix + name);
+    }
+
+    {
+        let name = "replaceMultipleIncomingRelations";
+        let currentSelect = new DbmGraphApi.admin.edit.ReplaceMultipleIncomingRelations();
+        currentSelect.item.register(prefix + name);
+    }
+
+    {
+        let name = "replaceMultipleOutgoingRelations";
+        let currentSelect = new DbmGraphApi.admin.edit.ReplaceMultipleOutgoingRelations();
         currentSelect.item.register(prefix + name);
     }
 
