@@ -18,6 +18,16 @@ export default class Relations extends EncodeBaseObject {
 
         returnObject["relations"] = relations;
 
+        {
+            let ids = Dbm.utils.ArrayFunctions.mapField(relations["in"], "id");
+            await aEncodingSession.encodeObjects(database.getObjects(ids), "objectTypes");
+        }
+        {
+            let ids = Dbm.utils.ArrayFunctions.mapField(relations["out"], "id");
+            await aEncodingSession.encodeObjects(database.getObjects(ids), "objectTypes");
+        }
+
+
         return returnObject;
     }
 }
