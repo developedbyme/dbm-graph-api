@@ -32,14 +32,20 @@ export default class JsonLdGenerator extends Dbm.core.BaseObject{
         let site = Dbm.getInstance().repository.getItem("site");
         let fields = await aDatabaseObject.getFields();
     
-        return {
+        let returnObject = {
             "@type": "Organization",
             "@id": this.baseUrl + "/" + "#organization",
             "url": this.baseUrl + "/",
             "name": fields["name"] ? fields["name"] : site.name,
         };
 
-        //Logo
+        let image = await aDatabaseObject.singleObjectRelationQuery("in:isLogoFor:image");
+        if(image) {
+            let fields = await image.getFields();
+            returnObject["logo"] = fields["url"];
+        }
+
+        return returnObject;
     }
 
     async encodeLocalBusiness(aDatabaseObject) {
@@ -55,10 +61,20 @@ export default class JsonLdGenerator extends Dbm.core.BaseObject{
         
         let fields = await aDatabaseObject.getFields();
 
+        let baseUrl = this.baseUrl;
+
+        let representingPage = await aDatabaseObject.singleObjectRelationQuery("in:pageRepresentationFor:page");
+        if(representingPage) {
+            baseUrl += await representingPage.getUrl();
+        }
+        else {
+            baseUrl += "/";
+        }
+
         let returnObject = {
             "@type": typeName,
-            "@id": this.baseUrl + "/" + "#local-business",
-            "url": this.baseUrl + "/",
+            "@id": baseUrl  + "#local-business",
+            "url": baseUrl,
             "name": fields["name"] ? fields["name"] : site.name,
             "telephone": fields["phoneNumber"],
             "email": fields["email"],
@@ -96,6 +112,12 @@ export default class JsonLdGenerator extends Dbm.core.BaseObject{
                 "latitude": fields["latitude"],
                 "longitude": fields["longitude"]
             };
+        }
+
+        let image = await aDatabaseObject.singleObjectRelationQuery("in:isMainImageFor:image");
+        if(image) {
+            let fields = await image.getFields();
+            returnObject["image"] = fields["url"];
         }
 
         return returnObject;
@@ -151,7 +173,27 @@ export default class JsonLdGenerator extends Dbm.core.BaseObject{
               "@id": fullUrl +"#breadcrumb"
             },
             
-          }
+          };
+
+          let image = await aPage.singleObjectRelationQuery("in:isMainImageFor:image");
+            if(image) {
+                let fields = await image.getFields();
+
+                let imageObject =  {
+                    "@type": "ImageObject",
+                    "url": fields["url"]
+                };
+                pageObject["primaryImageOfPage"] = imageObject;
+            }
+
+
+            let representingEntity = await aPage.singleObjectRelationQuery("out:pageRepresentationFor:localBusiness");
+            if(representingEntity) {
+                pageObject["mainEntity"] = {
+                    "@id": fullUrl + "#local-business"
+                }
+            }
+
           returnArray.push(pageObject);
 
           let urlParts = url.split("/");
