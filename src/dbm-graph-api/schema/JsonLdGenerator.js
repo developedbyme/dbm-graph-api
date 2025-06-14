@@ -44,10 +44,15 @@ export default class JsonLdGenerator extends Dbm.core.BaseObject{
 
     async encodeLocalBusiness(aDatabaseObject) {
 
+
         let site = Dbm.getInstance().repository.getItem("site");
 
         let type = await aDatabaseObject.singleObjectRelationQuery("in:for:schema/type");
-        let typeName = await type.getIdentifier();
+        let typeName = "LocalBusiness";
+        if(type) {
+            typeName = await type.getIdentifier();
+        }
+        
         let fields = await aDatabaseObject.getFields();
 
         let returnObject = {
@@ -114,7 +119,11 @@ export default class JsonLdGenerator extends Dbm.core.BaseObject{
                 let currentArrayLength = currentArray.length;
                 for(let i = 0; i < currentArrayLength; i++) {
                     let currentLocalBusiness = currentArray[i];
-                    returnArray.push(await this.encodeLocalBusiness(currentLocalBusiness));
+                    if(currentLocalBusiness) {
+                        console.log(currentLocalBusiness);
+                        returnArray.push(await this.encodeLocalBusiness(currentLocalBusiness));
+                        console.log("-");
+                    }
                 }
             }
         }
