@@ -17,5 +17,8 @@ export {default as ObjectTypes} from "./ObjectTypes.js";
 export {default as RepresentingPage} from "./RepresentingPage.js";
 export {default as PageRepresentation} from "./PageRepresentation.js";
 export {default as HelpSection} from "./HelpSection.js";
+export {default as MainImage} from "./MainImage.js";
+export {default as Location} from "./Location.js";
+export {default as AtLocation} from "./AtLocation.js";
 
 export * as admin from "./admin/index.js";

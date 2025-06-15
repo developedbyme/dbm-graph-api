@@ -59,7 +59,19 @@ let fullSelectSetup = function() {
     }
 }
 
+
+
 export {fullSelectSetup};
+
+let registerEncoding = function(aName, aEncoder) {
+    let encodePrefix = "graphApi/range/encode/";
+    aEncoder.item.register(encodePrefix + aName);
+    aEncoder.item.setValue("encodingType", aName);
+
+    return aEncoder;
+}
+
+export {registerEncoding};
 
 let fullEncodeSetup = function() {
     let encodePrefix = "graphApi/range/encode/";
@@ -188,6 +200,10 @@ let fullEncodeSetup = function() {
         currentEncode.item.register(encodePrefix + name);
         currentEncode.item.setValue("encodingType", name);
     }
+
+    registerEncoding("atLocation", new DbmGraphApi.range.encode.AtLocation());
+    registerEncoding("location", new DbmGraphApi.range.encode.Location());
+    registerEncoding("mainImage", new DbmGraphApi.range.encode.MainImage());
 }
 
 export {fullEncodeSetup};
