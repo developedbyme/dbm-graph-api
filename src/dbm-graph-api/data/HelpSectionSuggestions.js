@@ -27,7 +27,7 @@ export default class HelpSectionSuggestions extends Dbm.core.BaseObject {
 
         let contentString = JSON.stringify(content);
 
-        let instructions = "Generate a seo description for the page data provided by the user. Split up the description into different lines and only keep the ones that can be used to link to this page. {additionalInstructions} Respond with only a json object {seoDescription: string, linkTitles: array of string}, no markdown.";
+        let instructions = "Summarize what this page is about and generate sections for faq of what this page answers. Write the answer in an active tone of voice, call the company we and the user you. {additionalInstructions} Respond with only a json object {summary: string, questions: [{question: string, oneLineAnswer: string, answer: string, readMoreLinkText: string}]}, no markdown.";
         instructions = instructions.split("{data}").join(contentString);
         
         let additionalInstructions = "";
