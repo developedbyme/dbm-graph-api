@@ -16,7 +16,7 @@ export default class HelpSection extends EncodeBaseObject {
         returnObject["question"] = fields["question"] !== null ? fields["question"] : null;
         returnObject["title"] = fields["title"] !== null ? fields["title"] : null;
         returnObject["link"] = fields["link"] !== null ? fields["link"] : null;
-        returnObject["content"] = fields["content"] !== null ? fields["content"] : null;
+        returnObject["description"] = fields["description"] !== null ? fields["description"] : null;
         returnObject["linkText"] = fields["linkText"] !== null ? fields["linkText"] : null;
 
         {

@@ -27,7 +27,7 @@ export default class HelpSectionSuggestions extends Dbm.core.BaseObject {
 
         let contentString = JSON.stringify(content);
 
-        let instructions = "Summarize what this page is about and generate sections for faq of what this page answers. Write the answer in an active tone of voice, call the company we and the user you. {additionalInstructions} Respond with only a json object {summary: string, questions: [{question: string, oneLineAnswer: string, answer: string, readMoreLinkText: string}]}, no markdown.";
+        let instructions = "Summarize what this page is about and generate sections for faq of what this page answers. Phrase the question as a user would write it when they are looking for information. Write the answer in an active tone of voice, call the company we and the user you. Only create questions for answers that are on this page, so if the answer is linked on another page it should not be included. This questions are aleady answered, so exclude similar questions: 'How can I contact Smartbox Self Storage?'. {additionalInstructions} Respond with only a json object {summary: string, questions: [{question: string, oneLineAnswer: string, answer: string, readMoreLinkText: string}]}, no markdown.";
         instructions = instructions.split("{data}").join(contentString);
         
         let additionalInstructions = "";
