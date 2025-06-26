@@ -589,7 +589,8 @@ export const setupSite = function(aServer) {
                 }
 				
 				response += '  <url>\n';
-				response += '    <loc>' + fullUrl + url + '</loc>\n';
+                let encodedUrl = url.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+				response += '    <loc>' + fullUrl + encodedUrl + '</loc>\n';
 				if(fields["lastModified"]) {
 					response += '    <lastmod>' + fields["lastModified"] + '</lastmod>\n';
 				}
