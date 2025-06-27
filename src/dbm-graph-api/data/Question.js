@@ -30,7 +30,7 @@ export default class Question extends Dbm.core.BaseObject {
             let currentItem = currentArray[i];
             let fields = await currentItem.getFields();
 
-            let codedObject = {id: currentItem.id, content: fields.title};
+            let codedObject = {id: currentItem.id, question: fields.question, title: fields.title, answer: fields.description};
             helpPages[i] = codedObject;
         }
 
