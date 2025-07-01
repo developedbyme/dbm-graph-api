@@ -763,7 +763,7 @@ export const setupSite = function(aServer) {
 		
 		returnString += `<link rel="stylesheet" type="text/css" href="${assetsUri}css/main.css?version=${version}" />
 		
-		<link rel="icon" type="image/png" href="${assetsUri}img/favicon.png">`;
+		<link rel="icon" type="image/png" href="${baseUrl}${assetsUri}img/favicon.png">`;
 
 		if(fields['meta/description']) {
 			returnString += `
@@ -779,15 +779,35 @@ export const setupSite = function(aServer) {
 			<meta property="og:url" content="${fullUrl}" />
 		`;
 
+        if(fields["lastModified"]) {
+            returnString += `<meta property="article:modified_time" content="${fields["lastModified"]}" />\n`;
+        }
+
+        let image = await urlObject.singleObjectRelationQuery("in:isMainImageFor:image");
+        if(image) {
+            let imageFields = await image.getFields();
+
+            if(imageFields["resizeUrl"]) {
+                let imageUrl = imageFields["resizeUrl"];
+                let scaleString = "width=1200,height=630,fit=cover,format=jpeg";
+                imageUrl = imageUrl.split("{scale}").join(scaleString);
+
+                returnString += `<meta property="og:image" content="${imageUrl}" />\n`;
+                returnString += `<meta property="og:image:width" content="1200" />\n`;
+                returnString += `<meta property="og:image:height" content="630" />\n`;
+                returnString += `<meta property="og:image:type" content="image/jpeg" />\n`;
+                returnString += `<meta property="twitter:card" content="summary_large_image" />\n`;
+            }
+            else {
+                let imageUrl = imageFields["url"];
+                returnString += `<meta property="og:image" content="${imageUrl}" />\n`;
+                returnString += `<meta property="twitter:card" content="summary_large_image" />\n`;
+            }
+        }
+
 		/*
 	<meta property="article:publisher" content="https://sv-se.facebook.com/..." />
-	<meta property="article:modified_time" content="2024-09-03T13:19:26+00:00" />
-
-	<meta property="og:image" content="https://..." />
-	<meta property="og:image:width" content="1024" />
-	<meta property="og:image:height" content="683" />
-	<meta property="og:image:type" content="image/jpeg" />
-	<meta name="twitter:card" content="summary_large_image" />
+	
 	*/
 
 		returnString += `</head>
