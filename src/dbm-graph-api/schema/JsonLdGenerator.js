@@ -172,8 +172,17 @@ export default class JsonLdGenerator extends Dbm.core.BaseObject{
             "breadcrumb": {
               "@id": fullUrl +"#breadcrumb"
             },
-            
+            "publisher": {
+                "@id": this.baseUrl + "/" + "#organization"
+            }
           };
+
+          if(fields["publishDate"]) {
+            pageObject["datePublished"] = fields["publishDate"];
+          }
+          if(fields["lastModified"]) {
+            pageObject["dateModified"] = fields["lastModified"].split("T")[0];
+          }
 
           let image = await aPage.singleObjectRelationQuery("in:isMainImageFor:image");
             if(image) {
@@ -230,15 +239,6 @@ export default class JsonLdGenerator extends Dbm.core.BaseObject{
           returnArray.push(breadcrumbList);
 
         return returnArray;
-
-
-        
-
-          /*
-          "primaryImageOfPage": {
-              "@id": "https://example.com/product/acme-coffee-maker#primaryimage"
-            }
-              */
     }
 }
 

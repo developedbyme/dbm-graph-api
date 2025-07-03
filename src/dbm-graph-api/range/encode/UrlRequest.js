@@ -20,9 +20,23 @@ export default class UrlRequest extends EncodeBaseObject {
         await aEncodingSession.encodeSingle(aId, "pageRepresentation");
 
         let fields = await object.getFields();
+
+        returnObject["publishDate"] = fields["publishDate"] ? fields["publishDate"] : null;
+
         returnObject["meta/description"] = fields["meta/description"] ? fields["meta/description"] : null;
         returnObject["seo/noIndex"] = fields["seo/noIndex"] ? fields["seo/noIndex"] : false;
         returnObject["seo/noFollow"] = fields["seo/noFollow"] ? fields["seo/noFollow"] : false;
+
+        {
+            let relatedItems = await object.objectRelationQuery("out:in:group/pageCategory");
+            returnObject["categories"] = await aEncodingSession.encodeObjects(relatedItems, "type");
+        }
+
+        {
+            let relatedItem = await object.singleObjectRelationQuery("out:in:group/pageCategory");
+
+            returnObject["category"] = await aEncodingSession.encodeObjectOrNull(relatedItem, "type");
+        }
 
         return returnObject;
     }
