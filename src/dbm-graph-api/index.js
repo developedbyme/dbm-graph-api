@@ -195,6 +195,13 @@ let fullEncodeSetup = function() {
     }
 
     {
+        let name = "admin_user";
+        let currentEncode = new DbmGraphApi.range.encode.admin.User();
+        currentEncode.item.register(encodePrefix + name);
+        currentEncode.item.setValue("encodingType", name);
+    }
+
+    {
         let name = "helpSection";
         let currentEncode = new DbmGraphApi.range.encode.HelpSection();
         currentEncode.item.register(encodePrefix + name);
@@ -245,6 +252,7 @@ let fullActionSetup = function() {
     registerActionFunction("incomingWebhook", new DbmGraphApi.action.IncomingWebhook());
     registerActionFunction("cron/processActions", new DbmGraphApi.action.cron.ProcessActions());
     registerActionFunction("admin/addAndProcessAction", new DbmGraphApi.action.admin.AddAndProcessAction());
+    registerActionFunction("admin/addUser", new DbmGraphApi.action.admin.AddUser());
 
     registerActionFunction("admin/setup/setupWebsite", new DbmGraphApi.action.admin.setup.SetupWebsite());
     registerActionFunction("admin/setup/setupOrganization", new DbmGraphApi.action.admin.setup.SetupOrganization());

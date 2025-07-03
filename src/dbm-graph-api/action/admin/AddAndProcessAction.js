@@ -8,6 +8,7 @@ export default class AddAndProcessAction extends Dbm.core.BaseObject {
     async performAction(aData, aEncodeSession) {
         let returnObject = {};
 
+        await aEncodeSession.outputController.requireRole("admin");
         let user = await aEncodeSession.outputController.getUser();
         
         if(user) {
