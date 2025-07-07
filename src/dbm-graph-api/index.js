@@ -720,6 +720,14 @@ export const setupSite = function(aServer) {
             }
         }
 
+        if(fields["contentPreloadTags"]){
+            let currentArray = fields["contentPreloadTags"];
+            let currentArrayLength = currentArray.length;
+            for(let i = 0; i < currentArrayLength; i++) {
+                returnString += currentArray[i];
+            }
+        }
+
         if(site.disableSearchEngines) {
             returnString += `<meta name="robots" content="noindex, nofollow" />`;
         }
