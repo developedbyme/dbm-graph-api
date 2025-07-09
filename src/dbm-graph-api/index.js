@@ -249,6 +249,7 @@ export let registerActionFunction = function(aName, aDataFunction) {
 
 let fullActionSetup = function() {
     registerActionFunction("example", new DbmGraphApi.action.Example());
+    registerActionFunction("submitForm", new DbmGraphApi.action.SubmitForm());
     registerActionFunction("incomingWebhook", new DbmGraphApi.action.IncomingWebhook());
     registerActionFunction("cron/processActions", new DbmGraphApi.action.cron.ProcessActions());
     registerActionFunction("admin/addAndProcessAction", new DbmGraphApi.action.admin.AddAndProcessAction());
@@ -273,6 +274,8 @@ export let registerProcessActionFunction = function(aName, aDataFunction) {
 
 let fullProcessActionSetup = function() {
     registerProcessActionFunction("example", new DbmGraphApi.processAction.Example());
+
+    registerProcessActionFunction("handleFormSubmission", new DbmGraphApi.processAction.HandleFormSubmission());
 }
 
 export {fullProcessActionSetup};
