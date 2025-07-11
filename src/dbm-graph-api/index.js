@@ -773,16 +773,30 @@ export const setupSite = function(aServer) {
 		<meta property="og:title" content="${fields.title}" />`;
 
 		{
-                    let currentArray = site.injectCodeSnippets;
-                    let currentArrayLength = currentArray.length;
-                    for(let i = 0; i < currentArrayLength; i++) {
-                        returnString += currentArray[i];
-                    }
-                }
+            let currentArray = site.injectCodeSnippets;
+            let currentArrayLength = currentArray.length;
+            for(let i = 0; i < currentArrayLength; i++) {
+                returnString += currentArray[i];
+            }
+        }
+
+        if(process.env.INLINE_STYLE_SHEET == 1) {
+            returnString += `<style>`;
+
+            let assetsDir = Dbm.getInstance().repository.getItem("site").assetsDir;
+            let cssContent = await fs.promises.readFile(assetsDir + "/css/main.css", 'utf8');
+
+            returnString += cssContent;
+
+            returnString += `</style>`;
+        }
+        else {
+            returnString += `<link rel="stylesheet" type="text/css" href="${assetsUri}css/main.css?version=${version}" />`;
+        }
 		
-		returnString += `<link rel="stylesheet" type="text/css" href="${assetsUri}css/main.css?version=${version}" />
 		
-		<link rel="icon" type="image/png" href="${baseUrl}${assetsUri}img/favicon.png">`;
+		
+		returnString += `<link rel="icon" type="image/png" href="${baseUrl}${assetsUri}img/favicon.png">`;
 
 		if(fields['meta/description']) {
 			returnString += `
@@ -825,9 +839,8 @@ export const setupSite = function(aServer) {
         }
 
 		/*
-	<meta property="article:publisher" content="https://sv-se.facebook.com/..." />
-	
-	*/
+	    <meta property="article:publisher" content="https://sv-se.facebook.com/..." />
+        */
 
 		returnString += `</head>
 		<body>
