@@ -651,18 +651,17 @@ export const setupSite = function(aServer) {
 			reply.code(404);
 			reply.type('text/html');
 
-			let returnString = `
-				<!doctype html>
-				<html lang="${language}">
-				<head>
-				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-				<title>Page not found - ${siteName}</title>`;
+			let returnString = `<!doctype html>
+<html lang="${language}">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>Page not found - ${siteName}</title>`;
 
                 {
                     let currentArray = site.preconnectUrls;
-                    let currentArrayLength =currentArray.length;
+                    let currentArrayLength = currentArray.length;
                     for(let i = 0; i < currentArrayLength; i++) {
-                        returnString += `<link rel="preconnect" href="${currentArray[i]}" crossorigin>`;
+                        returnString += `<link rel="preconnect" href="${currentArray[i]}" crossorigin />`;
                     }
                 }
 
@@ -681,7 +680,7 @@ export const setupSite = function(aServer) {
 				returnString += `<link rel="stylesheet" type="text/css" href="${assetsUri}css/main.css?version=${version}" />
 				<meta name="viewport" content="initial-scale=1,user-scalable=yes" />
 				<meta name="HandheldFriendly" content="true" />
-				<link rel="icon" type="image/png" href="${assetsUri}img/favicon.png">
+				<link rel="icon" type="image/png" href="${assetsUri}img/favicon.png" />
 				</head>
 				<body>
 				<div id="site"></div>
@@ -705,34 +704,17 @@ export const setupSite = function(aServer) {
 
 		let fields = await urlObject.getFields();
 
-		let returnString = `
-		<!doctype html>
-		<html lang="${language}">
-		<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<meta name="viewport" content="initial-scale=1,user-scalable=yes" />
-		<meta name="HandheldFriendly" content="true" />
+        let baseUrl = request.protocol + "://" + request.hostname;
+		if(request.port && request.port !== 80 && request.port !== 443) {
+			baseUrl += ":" + request.port;
+		}
 
-        `;
+        let fullUrl = baseUrl + url;
 
-		{
-            let currentArray = site.preconnectUrls;
-            let currentArrayLength =currentArray.length;
-            for(let i = 0; i < currentArrayLength; i++) {
-                returnString += `<link rel="preconnect" href="${currentArray[i]}" crossorigin>`;
-            }
-        }
-
-        if(fields["contentPreloadTags"]){
-            let currentArray = fields["contentPreloadTags"];
-            let currentArrayLength = currentArray.length;
-            for(let i = 0; i < currentArrayLength; i++) {
-                returnString += currentArray[i];
-            }
-        }
+        let robotsText;
 
         if(site.disableSearchEngines) {
-            returnString += `<meta name="robots" content="noindex, nofollow" />`;
+            robotsText = "noindex, nofollow";
         }
         else {
             let robotsSettings = ["index", "follow"];
@@ -743,77 +725,100 @@ export const setupSite = function(aServer) {
                 robotsSettings[1] = "nofollow";
             }
 
-            let content = robotsSettings.join(", ");
-            returnString += `<meta name="robots" content="${content}" />`;
+            robotsText = robotsSettings.join(", ");
         }
 
-        let baseUrl = request.protocol + "://" + request.hostname;
-		if(request.port && request.port !== 80 && request.port !== 443) {
-			baseUrl += ":" + request.port;
+		let returnString = `<!doctype html>
+<html lang="${language}">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="viewport" content="initial-scale=1,user-scalable=yes" />
+		<meta name="HandheldFriendly" content="true" />
+        <title>${fields.title} - ${siteName}</title>` + "\n";
+        if(fields['meta/description']) {
+			returnString += `		<meta name="description" content="${fields['meta/description']}" />` + "\n";
 		}
+        returnString += `		<link rel="canonical" href="${fullUrl}" />`+ "\n";
+        returnString += `		<meta name="robots" content="${robotsText}" />`+ "\n";
+
+		{
+            let currentArray = site.preconnectUrls;
+            let currentArrayLength =currentArray.length;
+            for(let i = 0; i < currentArrayLength; i++) {
+                returnString += `		<link rel="preconnect" href="${currentArray[i]}" crossorigin />`+ "\n";
+            }
+        }
+
+        if(fields["contentPreloadTags"]){
+            let currentArray = fields["contentPreloadTags"];
+            let currentArrayLength = currentArray.length;
+            for(let i = 0; i < currentArrayLength; i++) {
+                returnString += "		" + currentArray[i] + "\n";
+            }
+        }
+
+        
+
+        
+
+        
 
         let schemaGenrator = new DbmGraphApi.schema.JsonLdGenerator();
         schemaGenrator.baseUrl = baseUrl;
         let schemaMarkup = await schemaGenrator.getWebsiteEntites();
         schemaMarkup = schemaMarkup.concat(await schemaGenrator.getPageEntites(urlObject))
-        let encodedMarkup = JSON.stringify(schemaMarkup, null, 2);
+        let encodedMarkup = JSON.stringify(schemaMarkup, null, 2).split("\n").join("\n\t\t\t\t");
 
-        returnString += `<script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@graph": ${encodedMarkup}
-        }
-        </script>`;
+        returnString += `		<script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@graph": ${encodedMarkup}
+			}
+		</script>`+ "\n";
             
-        returnString += `<title>${fields.title} - ${siteName}</title>
+        
 
-		<meta property="og:type" content="website" />
+		returnString += `		<meta property="og:type" content="website" />
 		<meta property="og:locale" content="${language}" />
 		<meta property="og:site_name" content="${siteName}" />
-		<meta property="og:title" content="${fields.title}" />`;
+		<meta property="og:title" content="${fields.title}" />`+ "\n";
 
 		{
             let currentArray = site.injectCodeSnippets;
             let currentArrayLength = currentArray.length;
             for(let i = 0; i < currentArrayLength; i++) {
-                returnString += currentArray[i];
+                returnString += "		" + currentArray[i] + "\n";
             }
         }
 
         if(process.env.INLINE_STYLE_SHEET == 1) {
-            returnString += `<style>`;
+            returnString += `		<style>`+ "\n";
 
             let assetsDir = Dbm.getInstance().repository.getItem("site").assetsDir;
             let cssContent = await fs.promises.readFile(assetsDir + "/css/main.css", 'utf8');
 
             returnString += cssContent;
 
-            returnString += `</style>`;
+            returnString += `		</style>`+ "\n";
         }
         else {
-            returnString += `<link rel="stylesheet" type="text/css" href="${assetsUri}css/main.css?version=${version}" />`;
+            returnString += `		<link rel="stylesheet" type="text/css" href="${assetsUri}css/main.css?version=${version}" />`+ "\n";
         }
 		
 		
 		
-		returnString += `<link rel="icon" type="image/png" href="${baseUrl}${assetsUri}img/favicon.png">`;
+		returnString += `		<link rel="icon" type="image/png" href="${baseUrl}${assetsUri}img/favicon.png" />`+ "\n";
 
 		if(fields['meta/description']) {
-			returnString += `
-				<meta name="description" content="${fields['meta/description']}" />
-				<meta property="og:description" content="${fields['meta/description']}" />
-			`;
+			returnString += `		<meta property="og:description" content="${fields['meta/description']}" />`+ "\n";;
 		}
 
-		let fullUrl = baseUrl + url;
+		
 
-		returnString += `
-			<link rel="canonical" href="${fullUrl}" />
-			<meta property="og:url" content="${fullUrl}" />
-		`;
+		returnString += `		<meta property="og:url" content="${fullUrl}" />`+ "\n";
 
         if(fields["lastModified"]) {
-            returnString += `<meta property="article:modified_time" content="${fields["lastModified"]}" />\n`;
+            returnString += `		<meta property="article:modified_time" content="${fields["lastModified"]}" />`+ "\n";;
         }
 
         let image = await urlObject.singleObjectRelationQuery("in:isMainImageFor:image");
@@ -825,16 +830,16 @@ export const setupSite = function(aServer) {
                 let scaleString = "width=1200,height=630,fit=cover,format=jpeg";
                 imageUrl = imageUrl.split("{scale}").join(scaleString);
 
-                returnString += `<meta property="og:image" content="${imageUrl}" />\n`;
-                returnString += `<meta property="og:image:width" content="1200" />\n`;
-                returnString += `<meta property="og:image:height" content="630" />\n`;
-                returnString += `<meta property="og:image:type" content="image/jpeg" />\n`;
-                returnString += `<meta property="twitter:card" content="summary_large_image" />\n`;
+                returnString += `		<meta property="og:image" content="${imageUrl}" />`+ "\n";;
+                returnString += `		<meta property="og:image:width" content="1200" />`+ "\n";;
+                returnString += `		<meta property="og:image:height" content="630" />`+ "\n";;
+                returnString += `		<meta property="og:image:type" content="image/jpeg" />`+ "\n";;
+                returnString += `		<meta property="twitter:card" content="summary_large_image" />`+ "\n";;
             }
             else {
                 let imageUrl = imageFields["url"];
-                returnString += `<meta property="og:image" content="${imageUrl}" />\n`;
-                returnString += `<meta property="twitter:card" content="summary_large_image" />\n`;
+                returnString += `		<meta property="og:image" content="${imageUrl}" />`+ "\n";;
+                returnString += `		<meta property="twitter:card" content="summary_large_image" />`+ "\n";;
             }
         }
 
@@ -842,8 +847,8 @@ export const setupSite = function(aServer) {
 	    <meta property="article:publisher" content="https://sv-se.facebook.com/..." />
         */
 
-		returnString += `</head>
-		<body>
+		returnString += `   </head>
+	<body>
 		<div id="site"></div>
 		<script>
 		(function(d,b,m,j,s){
@@ -853,8 +858,8 @@ export const setupSite = function(aServer) {
 		
 			dbmstartup.modules.create(document.getElementById("site"), "${moduleName}", {});
 		</script>
-		</body>
-		</html>`;
+	</body>
+</html>`;
 
 		return returnString;
 	});
