@@ -20,5 +20,7 @@ export {default as HelpSection} from "./HelpSection.js";
 export {default as MainImage} from "./MainImage.js";
 export {default as Location} from "./Location.js";
 export {default as AtLocation} from "./AtLocation.js";
+export {default as LinkPreview} from "./LinkPreview.js";
+export {default as PublishDate} from "./PublishDate.js";
 
 export * as admin from "./admin/index.js";

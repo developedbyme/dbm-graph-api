@@ -211,6 +211,8 @@ let fullEncodeSetup = function() {
     registerEncoding("atLocation", new DbmGraphApi.range.encode.AtLocation());
     registerEncoding("location", new DbmGraphApi.range.encode.Location());
     registerEncoding("mainImage", new DbmGraphApi.range.encode.MainImage());
+    registerEncoding("linkPreview", new DbmGraphApi.range.encode.LinkPreview());
+    registerEncoding("publishDate", new DbmGraphApi.range.encode.PublishDate());
 }
 
 export {fullEncodeSetup};
@@ -276,6 +278,8 @@ let fullProcessActionSetup = function() {
     registerProcessActionFunction("example", new DbmGraphApi.processAction.Example());
 
     registerProcessActionFunction("handleFormSubmission", new DbmGraphApi.processAction.HandleFormSubmission());
+
+    registerProcessActionFunction("pageUpdates/updateCategoryListing", new DbmGraphApi.processAction.pageUpdates.UpdateCategoryListing());
 }
 
 export {fullProcessActionSetup};
@@ -389,7 +393,6 @@ export const setupEndpoints = function(aServer) {
             url += "/";
         }
 		
-		console.log(url);
         //METODO: check visibility in database
 		let request = new UrlRequest();
         request.setup(aRequest, aReply);

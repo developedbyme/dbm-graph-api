@@ -7,7 +7,7 @@ export default class UrlRequest extends EncodeBaseObject {
     }
 
     async getEncodedData(aId, aEncodingSession) {
-        console.log("UrlRequest::getEncodedData");
+        //console.log("UrlRequest::getEncodedData");
 
         let returnObject = {};
 

@@ -14,6 +14,7 @@ export {default as ReplaceMultipleIncomingRelations} from "./ReplaceMultipleInco
 export {default as ReplaceMultipleOutgoingRelations} from "./ReplaceMultipleOutgoingRelations.js";
 export {default as AddObjectType} from "./AddObjectType.js";
 export {default as RemoveObjectType} from "./RemoveObjectType.js";
+export {default as AddAction} from "./AddAction.js";
 
 
 export const fullSetup = function() {
@@ -93,6 +94,12 @@ export const fullSetup = function() {
     {
         let name = "removeObjectType";
         let currentSelect = new DbmGraphApi.admin.edit.RemoveObjectType();
+        currentSelect.item.register(prefix + name);
+    }
+
+    {
+        let name = "addAction";
+        let currentSelect = new DbmGraphApi.admin.edit.AddAction();
         currentSelect.item.register(prefix + name);
     }
 }
