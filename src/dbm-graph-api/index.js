@@ -256,6 +256,7 @@ let fullActionSetup = function() {
     registerActionFunction("cron/processActions", new DbmGraphApi.action.cron.ProcessActions());
     registerActionFunction("admin/addAndProcessAction", new DbmGraphApi.action.admin.AddAndProcessAction());
     registerActionFunction("admin/addUser", new DbmGraphApi.action.admin.AddUser());
+    registerActionFunction("admin/user/setPassword", new DbmGraphApi.action.admin.SetPassword());
 
     registerActionFunction("admin/setup/setupWebsite", new DbmGraphApi.action.admin.setup.SetupWebsite());
     registerActionFunction("admin/setup/setupOrganization", new DbmGraphApi.action.admin.setup.SetupOrganization());

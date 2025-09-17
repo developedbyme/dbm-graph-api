@@ -11,6 +11,7 @@ export default class AddAndProcessAction extends Dbm.core.BaseObject {
         await aEncodeSession.outputController.requireRole("admin");
         let user = await aEncodeSession.outputController.getUser();
         
+        //METODO: check role
         if(user) {
             let type = aData["type"];
 

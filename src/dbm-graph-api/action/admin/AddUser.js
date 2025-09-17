@@ -6,44 +6,40 @@ export default class AddUser extends Dbm.core.BaseObject {
     }
 
     async performAction(aData, aEncodeSession) {
-        console.log("AddUser");
+        //console.log("AddUser");
         let returnObject = {};
 
         await aEncodeSession.outputController.requireRole("admin");
-        let user = await aEncodeSession.outputController.getUser();
 
         let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
         
-        if(user) {
-            let username = aData["username"];
+        let username = aData["username"];
 
-            if(username) {
-                let user = await database.getUserByUsername(username);
+        if(username) {
+            let user = await database.getUserByUsername(username);
 
-                if(!user) {
-                    user = await database.createUser();
-                    returnObject["created"] = true;
+            if(!user) {
+                user = await database.createUser();
+                returnObject["created"] = true;
 
-                    await user.setUsername(username);
-                    if(aData["password"]) {
-                        await user.setPassword(aData["password"]);
-                    }
-
-                    if(aData["role"]) {
-                        let role = await database.getIdentifiableObject("type/userRole", aData["role"]);
-                        await user.addIncomingRelation(role, "for");
-                    }
-                }
-                else {
-                    returnObject["created"] = false;
+                await user.setUsername(username);
+                if(aData["password"]) {
+                    await user.setPassword(aData["password"]);
                 }
 
-                returnObject["id"] = user.id;
+                if(aData["role"]) {
+                    let role = await database.getIdentifiableObject("type/userRole", aData["role"]);
+                    await user.addIncomingRelation(role, "for");
+                }
             }
             else {
-                throw("No username");
+                returnObject["created"] = false;
             }
-            
+
+            returnObject["id"] = user.id;
+        }
+        else {
+            throw("No username");
         }
 
         return returnObject;

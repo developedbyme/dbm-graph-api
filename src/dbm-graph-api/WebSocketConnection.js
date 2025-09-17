@@ -162,11 +162,19 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
                     let encodeSession = new DbmGraphApi.range.EncodeSession();
                     encodeSession.outputController = this;
 
-                    await encodeSession.encodeSingleWithTypes(id, data.encode);
+                    let logs = [];
+
+                    try {
+                        await encodeSession.encodeSingleWithTypes(id, data.encode);
+                    }
+                    catch(theError) {
+                        logs.push(theError.message);
+                        console.error(theError);
+                    }
 
                     encodeSession.destroy();
 
-                    this._webSocket.send(JSON.stringify({"type": "item/response", "id": id, "requestId": data["requestId"]}));
+                    this._webSocket.send(JSON.stringify({"type": "item/response", "id": id, "requestId": data["requestId"], "logs": logs}));
                 }
                 break;
             case "url":
