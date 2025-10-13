@@ -45,14 +45,26 @@ export default class ExternalTaskRunner extends Dbm.core.BaseObject {
 
             let response = await fetch(this.item.url, requestData);
 
-            let data = await response.json();
+            let responseText = await response.text();
 
-            let continueData = Dbm.objectPath(data, this.item.continueField);
-            console.log(this.item.name + " " + continueData);
-
-            if(continueData > 0) {
-                runDirect = true;
+            let data = null;
+            try {
+                data = JSON.parse(responseText);
             }
+            catch(theError) {
+                console.error(theError);
+                console.log(responseText);
+            }
+            
+            if(data) {
+                let continueData = Dbm.objectPath(data, this.item.continueField);
+                console.log(this.item.name + " " + continueData);
+
+                if(continueData > 0) {
+                    runDirect = true;
+                }
+            }
+            
         }
         catch(theError) {
             console.log(theError);
