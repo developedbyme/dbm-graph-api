@@ -22,5 +22,8 @@ export {default as Location} from "./Location.js";
 export {default as AtLocation} from "./AtLocation.js";
 export {default as LinkPreview} from "./LinkPreview.js";
 export {default as PublishDate} from "./PublishDate.js";
+export {default as SingleRelation} from "./SingleRelation.js";
+export {default as TranslatedTitle} from "./TranslatedTitle.js";
+export {default as TranslatedName} from "./TranslatedName.js";
 
 export * as admin from "./admin/index.js";

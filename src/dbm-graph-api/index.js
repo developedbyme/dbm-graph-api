@@ -73,6 +73,12 @@ let registerEncoding = function(aName, aEncoder) {
 
 export {registerEncoding};
 
+let registerEncodingClass = function(aEncoderClass) {
+    return registerEncoding(aEncoderClass.DEFAULT_ENCODING_NAME, new aEncoderClass());
+}
+
+export {registerEncodingClass};
+
 let fullEncodeSetup = function() {
     let encodePrefix = "graphApi/range/encode/";
     {
@@ -213,6 +219,12 @@ let fullEncodeSetup = function() {
     registerEncoding("mainImage", new DbmGraphApi.range.encode.MainImage());
     registerEncoding("linkPreview", new DbmGraphApi.range.encode.LinkPreview());
     registerEncoding("publishDate", new DbmGraphApi.range.encode.PublishDate());
+
+    registerEncoding("title_translations", new DbmGraphApi.range.encode.TranslatedTitle());
+    registerEncoding("admin_fieldTranslations", new DbmGraphApi.range.encode.admin.FieldTranslations());
+
+    registerEncoding("language", DbmGraphApi.range.encode.SingleRelation.create("language", "in:for:language", "type"));
+    registerEncodingClass(DbmGraphApi.range.encode.TranslatedName);
 }
 
 export {fullEncodeSetup};
@@ -707,6 +719,10 @@ export const setupSite = function(aServer) {
 		reply.type('text/html');
 
 		let fields = await urlObject.getFields();
+        let languageItem = await urlObject.singleObjectRelationQuery("in:for:language");
+        if(languageItem) {
+            language = await languageItem.getIdentifier();
+        }
 
         let baseUrl = request.protocol + "://" + request.hostname;
 		if(request.port && request.port !== 80 && request.port !== 443) {

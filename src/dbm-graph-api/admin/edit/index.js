@@ -15,6 +15,7 @@ export {default as ReplaceMultipleOutgoingRelations} from "./ReplaceMultipleOutg
 export {default as AddObjectType} from "./AddObjectType.js";
 export {default as RemoveObjectType} from "./RemoveObjectType.js";
 export {default as AddAction} from "./AddAction.js";
+export {default as SetFieldTranslation} from "./SetFieldTranslation.js";
 
 
 export const fullSetup = function() {
@@ -100,6 +101,12 @@ export const fullSetup = function() {
     {
         let name = "addAction";
         let currentSelect = new DbmGraphApi.admin.edit.AddAction();
+        currentSelect.item.register(prefix + name);
+    }
+
+    {
+        let name = "setFieldTranslation";
+        let currentSelect = new DbmGraphApi.admin.edit.SetFieldTranslation();
         currentSelect.item.register(prefix + name);
     }
 }
