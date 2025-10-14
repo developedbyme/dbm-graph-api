@@ -39,6 +39,12 @@ export default class UrlRequest extends EncodeBaseObject {
             returnObject["category"] = await aEncodingSession.encodeObjectOrNull(relatedItem, "type");
         }
 
+        {
+            let relatedItem = await object.singleObjectRelationQuery("out:in:group/translationGroup");
+
+            returnObject["translations"] = await aEncodingSession.encodeObjectOrNull(relatedItem, "translationGroup");
+        }
+
         return returnObject;
     }
 }

@@ -225,6 +225,7 @@ let fullEncodeSetup = function() {
 
     registerEncoding("language", DbmGraphApi.range.encode.SingleRelation.create("language", "in:for:language", "type"));
     registerEncodingClass(DbmGraphApi.range.encode.TranslatedName);
+    registerEncoding("translationGroup", new DbmGraphApi.range.encode.TranslationGroup());
 }
 
 export {fullEncodeSetup};

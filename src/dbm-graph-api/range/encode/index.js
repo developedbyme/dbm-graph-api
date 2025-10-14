@@ -25,5 +25,6 @@ export {default as PublishDate} from "./PublishDate.js";
 export {default as SingleRelation} from "./SingleRelation.js";
 export {default as TranslatedTitle} from "./TranslatedTitle.js";
 export {default as TranslatedName} from "./TranslatedName.js";
+export {default as TranslationGroup} from "./TranslationGroup.js";
 
 export * as admin from "./admin/index.js";
