@@ -114,7 +114,7 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
                     console.error(theError);
                 }
 
-                this._webSocket.send(JSON.stringify({"type": "range/response", "ids": ids, "requestId": data["requestId"], "logs": logs}));
+                this._sendData({"type": "range/response", "ids": ids, "requestId": data["requestId"], "logs": logs});
                 break;
             case "data":
                 {
@@ -128,7 +128,7 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
                         returnData = await dataFunctionItem.controller.getData(data['data'], encodeSession);
                     }
 
-                    this._webSocket.send(JSON.stringify({"type": "data/response", "data": returnData, "requestId": data["requestId"]}));
+                    this._sendData({"type": "data/response", "data": returnData, "requestId": data["requestId"]});
                 }
                 break;
             case "action":
@@ -151,7 +151,7 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
                         console.error(theError);
                     }
 
-                    this._webSocket.send(JSON.stringify({"type": "data/response", "data": returnData, "requestId": data["requestId"], "logs": logs}));
+                    this._sendData({"type": "data/response", "data": returnData, "requestId": data["requestId"], "logs": logs});
                 }
                 break;
             case "item":
@@ -174,7 +174,7 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
 
                     encodeSession.destroy();
 
-                    this._webSocket.send(JSON.stringify({"type": "item/response", "id": id, "requestId": data["requestId"], "logs": logs}));
+                    this._sendData({"type": "item/response", "id": id, "requestId": data["requestId"], "logs": logs});
                 }
                 break;
             case "url":
@@ -196,10 +196,10 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
 
                         await encodeSession.encodeSingleWithTypes(urlObject.id, ["urlRequest"]);
                         encodeSession.destroy();
-                        this._webSocket.send(JSON.stringify({"type": "url/response", "id": urlObject.id, "requestId": data["requestId"]}));
+                        this._sendData({"type": "url/response", "id": urlObject.id, "requestId": data["requestId"]});
                     }
                     else {
-                        this._webSocket.send(JSON.stringify({"type": "url/response", "id": 0, "requestId": data["requestId"]}));
+                        this._sendData({"type": "url/response", "id": 0, "requestId": data["requestId"]});
                     }
                 }
                 break;
@@ -238,7 +238,7 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
                     }
                     
                     
-                    this._webSocket.send(JSON.stringify({"type": "item/response", "id": returnId, "requestId": data["requestId"]}));
+                    this._sendData({"type": "item/response", "id": returnId, "requestId": data["requestId"]});
                 }
                 break;
             case "admin/editObject":
@@ -268,7 +268,7 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
                     }
                     
                     
-                    this._webSocket.send(JSON.stringify({"type": "item/response", "id": theObject.id, "requestId": data["requestId"]}));
+                    this._sendData({"type": "item/response", "id": theObject.id, "requestId": data["requestId"]});
                 }
                 break;
             case "user/signInWithToken":
@@ -287,17 +287,27 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
                         this.item.setValue("user", user);
                     }
 
-                    this._webSocket.send(JSON.stringify({"type": "currentUser/response", "id": userId, "requestId": data["requestId"]}));
-                    
+                    this._sendData({"type": "currentUser/response", "id": userId, "requestId": data["requestId"]});
                 }
                 break;
             case "heartbeat":
                 {
-                    this._webSocket.send(JSON.stringify({"type": "heartbeat/response"}));
-                    
+                    this._sendData({"type": "heartbeat/response"});
                 }
                 break;
         }	
+    }
+
+    _sendData(aData) {
+        if(this._webSocket) {
+            let encodedData = JSON.stringify(aData);
+            try {
+                this._webSocket.send(encodedData);
+            }
+            catch(theError) {
+                console.error();
+            }
+        }
     }
 
     _callback_error(aMessage) {
@@ -336,7 +346,7 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
     outputEncodedData(aId, aData, aEncoding) {
         //console.log("WebSocketConnection::outputEncodedData");
 
-        this._webSocket.send(JSON.stringify({"type": "updateEncodedObject", "id": aId, "data": aData, "encoding": aEncoding}));
+        this._sendData({"type": "updateEncodedObject", "id": aId, "data": aData, "encoding": aEncoding});
         
     }
 
@@ -352,7 +362,7 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
             this.item.setValue("user", null);
         }
 
-        this._webSocket.send(JSON.stringify({"type": "connectionReady", "user": aId}));
+        this._sendData({"type": "connectionReady", "user": aId});
     }
 
     async getUser() {

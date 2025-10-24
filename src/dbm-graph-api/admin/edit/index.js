@@ -16,6 +16,7 @@ export {default as AddObjectType} from "./AddObjectType.js";
 export {default as RemoveObjectType} from "./RemoveObjectType.js";
 export {default as AddAction} from "./AddAction.js";
 export {default as SetFieldTranslation} from "./SetFieldTranslation.js";
+export {default as Trash} from "./Trash.js";
 
 
 export const fullSetup = function() {
@@ -107,6 +108,12 @@ export const fullSetup = function() {
     {
         let name = "setFieldTranslation";
         let currentSelect = new DbmGraphApi.admin.edit.SetFieldTranslation();
+        currentSelect.item.register(prefix + name);
+    }
+
+    {
+        let name = "trash";
+        let currentSelect = new DbmGraphApi.admin.edit.Trash();
         currentSelect.item.register(prefix + name);
     }
 }
