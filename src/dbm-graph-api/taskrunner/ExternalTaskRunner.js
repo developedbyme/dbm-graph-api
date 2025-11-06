@@ -1,6 +1,8 @@
 import Dbm from "dbm";
 import DbmGraphApi from "../../../index.js";
 
+import { performance } from 'node:perf_hooks';
+
 export default class ExternalTaskRunner extends Dbm.core.BaseObject {
 
     _construct() {
@@ -43,9 +45,12 @@ export default class ExternalTaskRunner extends Dbm.core.BaseObject {
                 requestData["body"] = this.item.body;
             }
 
+            let startTime = performance.now();
             let response = await fetch(this.item.url, requestData);
 
             let responseText = await response.text();
+
+            let endTime = performance.now();
 
             let data = null;
             try {
@@ -58,7 +63,8 @@ export default class ExternalTaskRunner extends Dbm.core.BaseObject {
             
             if(data) {
                 let continueData = Dbm.objectPath(data, this.item.continueField);
-                console.log(this.item.name + " " + continueData);
+                let callTime = ((endTime-startTime)/1000).toFixed(3);
+                console.log(this.item.name + ` (time: ${callTime} continue: ${continueData})`);
 
                 if(continueData > 0) {
                     runDirect = true;
