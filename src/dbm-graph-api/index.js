@@ -294,6 +294,8 @@ let fullProcessActionSetup = function() {
     registerProcessActionFunction("handleFormSubmission", new DbmGraphApi.processAction.HandleFormSubmission());
 
     registerProcessActionFunction("pageUpdates/updateCategoryListing", new DbmGraphApi.processAction.pageUpdates.UpdateCategoryListing());
+    registerProcessActionFunction("pageUpdates/updateRenderedContent", new DbmGraphApi.processAction.pageUpdates.UpdateRenderedContent());
+    registerProcessActionFunction("pageUpdates/clearCache", new DbmGraphApi.processAction.pageUpdates.ClearCloudflareCache());
 }
 
 export {fullProcessActionSetup};
@@ -868,16 +870,34 @@ export const setupSite = function(aServer) {
 	    <meta property="article:publisher" content="https://sv-se.facebook.com/..." />
         */
 
+
+        let renderedContent = "";
+        
+        if(fields["renderedPageContent"]) {
+            renderedContent = fields["renderedPageContent"];
+        }
+        
+        let renderedContentHolder = "";
+        if(renderedContent) {
+            renderedContentHolder = `<div id="preRenderContent">${renderedContent}</div>`;
+        }
+
+        let moduleData = {};
+        //METODO: add page data
+        let endodedModuleData = JSON.stringify(moduleData);
+
 		returnString += `   </head>
 	<body>
-		<div id="site"></div>
+		<div id="site">
+            ${renderedContentHolder}
+        </div>
 		<script>
 		(function(d,b,m,j,s){
 				d[m] = d[m] || {}; d[m][j] = d[m][j] || {_: [], create: function(element, moduleName, data) {return this._.push({element, moduleName, data});}, remove: function(id) {this._[id-1] = null;}};
 				let e = b.createElement("script"); e.async = true; e.src = s; b.head.appendChild(e);
 			})(window, document, "dbmstartup", "modules", "${assetsUri}js/${loader}");
 		
-			dbmstartup.modules.create(document.getElementById("site"), "${moduleName}", {});
+			dbmstartup.modules.create(document.getElementById("site"), "${moduleName}", ${endodedModuleData});
 		</script>
 	</body>
 </html>`;
