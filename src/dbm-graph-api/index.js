@@ -276,6 +276,8 @@ let fullActionSetup = function() {
 
     registerActionFunction("development/restartServer", new DbmGraphApi.action.development.RestartServer());
     registerActionFunction("development/restartDatabaseConnection", new DbmGraphApi.action.development.RestartDatabaseConnection());
+
+    registerActionFunction("development/reRenderPages", new DbmGraphApi.action.development.ReRenderPages());
 }
 
 export {fullActionSetup};
