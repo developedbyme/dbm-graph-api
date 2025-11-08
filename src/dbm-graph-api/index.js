@@ -538,7 +538,7 @@ export const setupEndpoints = function(aServer) {
 export const setupSite = function(aServer) {
 
     aServer.get('/cdn-cgi/image/:options/*', async function(request, reply) {
-        console.log("/cdn-cgi/image/");
+        //console.log("/cdn-cgi/image/");
 
         let publicDir = Dbm.getInstance().repository.getItem("site").publicDir;
 
@@ -548,8 +548,7 @@ export const setupSite = function(aServer) {
 		let realPath;
 		try {
 			realPath = fs.realpathSync(publicDir + "/" + imageUrl);
-            console.log(realPath);
-			console.log(realPath);
+            //console.log(realPath);
 			if(realPath.indexOf(publicDir + "/") !== 0) {
 				throw("Not in folder");
 			}

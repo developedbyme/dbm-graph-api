@@ -10,7 +10,7 @@ export default class JsonLdGenerator extends Dbm.core.BaseObject{
     }
 
     async encodeWebsiteEntity(aDatabaseObject) {
-        console.log("encodeWebsiteEntity");
+        //console.log("encodeWebsiteEntity");
 
         let site = Dbm.getInstance().repository.getItem("site");
         let fields = await aDatabaseObject.getFields();
@@ -27,7 +27,7 @@ export default class JsonLdGenerator extends Dbm.core.BaseObject{
     }
 
     async encodeOrganizationEntity(aDatabaseObject) {
-        console.log("encodeOrganizationEntity");
+        //console.log("encodeOrganizationEntity");
 
         let site = Dbm.getInstance().repository.getItem("site");
         let fields = await aDatabaseObject.getFields();
@@ -124,7 +124,7 @@ export default class JsonLdGenerator extends Dbm.core.BaseObject{
     }
     
     async getWebsiteEntites() {
-        console.log("getWebsiteEntites");
+        //console.log("getWebsiteEntites");
     
         let returnArray = [];
         let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
@@ -142,9 +142,9 @@ export default class JsonLdGenerator extends Dbm.core.BaseObject{
                 for(let i = 0; i < currentArrayLength; i++) {
                     let currentLocalBusiness = currentArray[i];
                     if(currentLocalBusiness) {
-                        console.log(currentLocalBusiness);
+                        //console.log(currentLocalBusiness);
                         returnArray.push(await this.encodeLocalBusiness(currentLocalBusiness));
-                        console.log("-");
+                        //console.log("-");
                     }
                 }
             }
