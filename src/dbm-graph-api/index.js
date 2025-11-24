@@ -368,38 +368,74 @@ export const setupEndpoints = function(aServer) {
 		return { success: false, error: "incorrect", message: "Incorrect details"};
 	});
 
-    aServer.get('/api/user/me', async function handler (aRequest, aReply) {
-        let cookies = aRequest.headers.cookie ? aRequest.headers.cookie.split(";") : [];
-        let currentArray = cookies;
-        let currentArrayLength = currentArray.length;
-        for(let i = 0; i < currentArrayLength; i++) {
-            let [key, value] = currentArray[i].split("=");
-            if(key === "dbm_session" || key === " dbm_session") {
-                let userId = 1*value.split(":")[1];
-                let user = Dbm.getInstance().repository.getItem("graphDatabase").controller.getUser(userId);
-
-                let isValidSession = await user.verifySession(value);
-                if(isValidSession) {
-                    return {success: true, data: {id: userId}};
+    let getPublicSessionIdFomCookie = function(aCookies) {
+        if(aCookies) {
+            let cookies = aCookies.split(";");
+            let currentArray = cookies;
+            let currentArrayLength = currentArray.length;
+            for(let i = 0; i < currentArrayLength; i++) {
+                let [key, value] = currentArray[i].split("=");
+                if(key === "dbm_session" || key === " dbm_session") {
+                    return value;
                 }
             }
+        }
+        
+        return null;
+    }
+
+    let getUserFromPublicSessionId = async function(aPublicSessionId) {
+        if(aPublicSessionId) {
+            let userId = 1*aPublicSessionId.split(":")[1];
+            let user = Dbm.getRepositoryItem("graphDatabase").controller.getUser(userId);
+
+            let isValidSession = await user.verifySession(aPublicSessionId);
+            if(isValidSession) {
+                return user;
+            }
+        }
+
+        return null;
+    }
+
+    let getUserFromCookie = async function(aCookies) {
+        let publicSessionId = getPublicSessionIdFomCookie(aCookies);
+        return await getUserFromPublicSessionId(publicSessionId);
+    }
+
+    aServer.get('/api/user/me', async function handler (aRequest, aReply) {
+        let user = await getUserFromCookie(aRequest.headers.cookie);
+        if(user) {
+            return {success: true, data: {id: user.id}};
         }
 
         return {success: false, data: null};
     });
 
 	aServer.post('/api/user/logout', async function handler (aRequest, aReply) {
-		console.log(aRequest.body);
 
-		//METODO: clear session from database
-		//METODO: clear cookie
+        let publicSessionId = getPublicSessionIdFomCookie(aRequest.headers.cookie);
+        let user = await getUserFromPublicSessionId(publicSessionId);
+
+        if(user) {
+            let sessionId = 1*publicSessionId.split(":")[0];
+            await user.deleteSession(sessionId);
+        }
+
+        aReply.header("Set-Cookie", "dbm_session=; Path=/; Max-Age=0; HttpOnly;");
+        return {success: true, data: null};
 	});
 
 	aServer.post('/api/user/renewSession', async function handler (aRequest, aReply) {
-		console.log(aRequest.body);
+		let user = await getUserFromCookie(aRequest.headers.cookie);
+        if(user) {
+            //METODO: update session
+		    //METODO: update cookie
 
-		//METODO: clear session from database
-		//METODO: clear cookie
+            //METODO: return success
+        }
+
+		return {success: false, data: null};
 	});
 	
 	aServer.get('/api/url', async function handler (aRequest, aReply) {

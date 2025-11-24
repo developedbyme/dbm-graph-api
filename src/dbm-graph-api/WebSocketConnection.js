@@ -299,6 +299,12 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
                     this._sendData({"type": "currentUser/response", "id": userId, "requestId": data["requestId"]});
                 }
                 break;
+            case "user/signOut":
+                {
+                    this.item.setValue("user", null);
+                    this._sendData({"type": "currentUser/response", "id": 0, "requestId": data["requestId"]});
+                }
+                break;
             case "heartbeat":
                 {
                     this._sendData({"type": "heartbeat/response"});
@@ -341,6 +347,8 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
 		this.item.api.controller.connectionClosed(this);
 		this.item.setValue("api", null);
 		this.item.setValue("controller", null);
+
+        this.item.setValue("user", null);
 	}
 
     addListeners() {
