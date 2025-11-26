@@ -5,3 +5,4 @@ export {default as IncludePrivate} from "./IncludePrivate.js";
 export {default as IncludeDraft} from "./IncludeDraft.js";
 export {default as ObjectRelationQuery} from "./ObjectRelationQuery.js";
 export {default as GlobalObjectRelationQuery} from "./GlobalObjectRelationQuery.js";
+export {default as WithIdentifier} from "./WithIdentifier.js";

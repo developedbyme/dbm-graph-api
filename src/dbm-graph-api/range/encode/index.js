@@ -26,5 +26,8 @@ export {default as SingleRelation} from "./SingleRelation.js";
 export {default as TranslatedTitle} from "./TranslatedTitle.js";
 export {default as TranslatedName} from "./TranslatedName.js";
 export {default as TranslationGroup} from "./TranslationGroup.js";
+export {default as MenuLocation} from "./MenuLocation.js";
+export {default as Menu} from "./Menu.js";
+export {default as MenuItem} from "./MenuItem.js";
 
 export * as admin from "./admin/index.js";

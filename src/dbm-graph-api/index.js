@@ -57,6 +57,12 @@ let fullSelectSetup = function() {
         let currentSelect = new DbmGraphApi.range.select.GlobalObjectRelationQuery();
         currentSelect.item.register(selectPrefix + name);
     }
+
+    {
+        let name = "withIdentifier";
+        let currentSelect = new DbmGraphApi.range.select.WithIdentifier();
+        currentSelect.item.register(selectPrefix + name);
+    }
 }
 
 
@@ -226,6 +232,10 @@ let fullEncodeSetup = function() {
     registerEncoding("language", DbmGraphApi.range.encode.SingleRelation.create("language", "in:for:language", "type"));
     registerEncodingClass(DbmGraphApi.range.encode.TranslatedName);
     registerEncoding("translationGroup", new DbmGraphApi.range.encode.TranslationGroup());
+
+    registerEncoding("menuLocation", new DbmGraphApi.range.encode.MenuLocation());
+    registerEncoding("menu", new DbmGraphApi.range.encode.Menu());
+    registerEncoding("menuItem", new DbmGraphApi.range.encode.MenuItem());
 }
 
 export {fullEncodeSetup};
