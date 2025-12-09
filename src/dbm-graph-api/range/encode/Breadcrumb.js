@@ -7,7 +7,7 @@ export default class Breadcrumb extends EncodeBaseObject {
     }
 
     async getEncodedData(aId, aEncodingSession) {
-        console.log("Breadcrumb::getEncodedData");
+        //console.log("Breadcrumb::getEncodedData");
 
         let returnObject = {};
 

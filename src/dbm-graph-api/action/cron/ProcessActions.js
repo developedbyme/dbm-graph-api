@@ -8,7 +8,7 @@ export default class ProcessActions extends Dbm.core.BaseObject {
     async performAction(aData, aEncodeSession) {
         let returnObject = {};
 
-        let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
+        let database = Dbm.getRepositoryItem("graphDatabase").controller;
 
         let actionStatus = await database.getTypeObject("status/actionStatus", "readyToProcess");
         let actions = await actionStatus.objectRelationQuery("out:for:action");
@@ -17,24 +17,18 @@ export default class ProcessActions extends Dbm.core.BaseObject {
             let action = actions[0];
             returnObject["processed"] = action.id;
 
-            let processingActionStatus = await database.getTypeObject("status/actionStatus", "processing");
-            await action.replaceIncomingRelation(processingActionStatus, "for", "status/actionStatus");
+            await action.changeLinkedType("status/actionStatus", "processing");
 
-            let actionType = await (await action.singleObjectRelationQuery("in:for:type/actionType")).getIdentifier();
-            console.log(actionType);
+            let actionType = await action.getSingleLinkedType("type/actionType");
             
             let processActionItem = Dbm.getInstance().repository.getItemIfExists("graphApi/processAction/" + actionType);
 
             if(processActionItem) {
-
                 await processActionItem.controller.process(action);
-
-                let doneActionStatus = await database.getTypeObject("status/actionStatus", "done");
-                await action.replaceIncomingRelation(doneActionStatus, "for", "status/actionStatus");
+                await action.changeLinkedType("status/actionStatus", "done");
             }
             else {
-                let doneActionStatus = await database.getTypeObject("status/actionStatus", "noAction");
-                await action.replaceIncomingRelation(doneActionStatus, "for", "status/actionStatus");
+                await action.changeLinkedType("status/actionStatus", "noAction");
             }
 
             returnObject["remaining"] = actions.length-1;

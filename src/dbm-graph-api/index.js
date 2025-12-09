@@ -236,6 +236,8 @@ let fullEncodeSetup = function() {
     registerEncoding("menuLocation", new DbmGraphApi.range.encode.MenuLocation());
     registerEncoding("menu", new DbmGraphApi.range.encode.Menu());
     registerEncoding("menuItem", new DbmGraphApi.range.encode.MenuItem());
+
+    registerEncoding("action", new DbmGraphApi.range.encode.Action());
 }
 
 export {fullEncodeSetup};
@@ -313,14 +315,14 @@ let fullProcessActionSetup = function() {
 export {fullProcessActionSetup};
 
 let setupInternalTaskRunner = function() {
-    Dbm.getInstance().repository.getItem("taskRunner").requireProperty("runners", []);
+    Dbm.getRepositoryItem("taskRunner").requireProperty("runners", []);
 
     let runner = new DbmGraphApi.taskrunner.InternalTaskRunner();
     runner.startAtStartup();
 
-    let runners = [].concat(Dbm.getInstance().repository.getItem("taskRunner").runners);
+    let runners = [].concat(Dbm.getRepositoryItem("taskRunner").runners);
     runners.push(runner);
-    Dbm.getInstance().repository.getItem("taskRunner").runners = runners; 
+    Dbm.getRepositoryItem("taskRunner").runners = runners; 
     
 }
 
@@ -346,7 +348,7 @@ export const setupEndpoints = function(aServer) {
 
 		let username = aRequest.body['username'];
 
-		let user = await Dbm.getInstance().repository.getItem("graphDatabase").controller.getUserByUsername(username);
+		let user = await Dbm.getRepositoryItem("graphDatabase").controller.getUserByUsername(username);
 
 		if(!user) {
 			//METODO: get user by email

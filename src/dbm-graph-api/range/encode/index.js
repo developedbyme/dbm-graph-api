@@ -29,5 +29,6 @@ export {default as TranslationGroup} from "./TranslationGroup.js";
 export {default as MenuLocation} from "./MenuLocation.js";
 export {default as Menu} from "./Menu.js";
 export {default as MenuItem} from "./MenuItem.js";
+export {default as Action} from "./Action.js";
 
 export * as admin from "./admin/index.js";

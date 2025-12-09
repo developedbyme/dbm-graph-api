@@ -46,7 +46,7 @@ export default class Api extends Dbm.core.BaseObject {
                 let [key, value] = currentArray[i].split("=");
                 if(key === "dbm_session" || key === " dbm_session") {
                     let userId = 1*value.split(":")[1];
-                    let user = Dbm.getInstance().repository.getItem("graphDatabase").controller.getUser(userId);
+                    let user = Dbm.getRepositoryItem("graphDatabase").controller.getUser(userId);
     
                     user.verifySession(value).then(function(aIsValidSession) {
                         //console.log("verifySession", aIsValidSession);
