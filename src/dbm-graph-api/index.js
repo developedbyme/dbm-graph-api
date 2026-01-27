@@ -701,12 +701,16 @@ export const setupSite = function(aServer) {
 		}
 
 		let url = request.url;
+        let shouldRedirect = false;
 		let index = url.indexOf("?");
+        let queryString = null;
 		if(index >= 0) {
+            queryString = url.substring(index, url.length);
 			url = url.substring(0, index);
 		}
 		if(url[url.length-1] !== "/") {
 			url += "/";
+            shouldRedirect = true;
 		}
 		
 		let urlObject = await database.getObjectByUrl(url);
@@ -715,6 +719,13 @@ export const setupSite = function(aServer) {
 			moduleName = request.query.forceModule;
 		}
 
+        if(urlObject && shouldRedirect) {
+            let newUrl = url;
+            if(queryString) {
+                newUrl += queryString;
+            }
+            return reply.redirect(newUrl, 301);
+        }
 		if(!urlObject) {
 			reply.code(404);
 			reply.type('text/html');
