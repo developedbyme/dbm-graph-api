@@ -261,6 +261,8 @@ let fullDataSetup = function() {
     registerDataFunction("admin/helpSectionSuggestions", new DbmGraphApi.data.HelpSectionSuggestions());
     registerDataFunction("admin/altText", new DbmGraphApi.data.AltText());
 
+    registerDataFunction("actions/status", new DbmGraphApi.data.actions.Status());
+
     registerDataFunction("server/status", new DbmGraphApi.data.server.Status());
 }
 
@@ -306,6 +308,10 @@ let fullProcessActionSetup = function() {
     registerProcessActionFunction("example", new DbmGraphApi.processAction.Example());
 
     registerProcessActionFunction("handleFormSubmission", new DbmGraphApi.processAction.HandleFormSubmission());
+
+    registerProcessActionFunction("httpRequest/get", new DbmGraphApi.processAction.httpRequests.GetRequest());
+
+    registerProcessActionFunction("actionGroup/process", new DbmGraphApi.processAction.actionGroup.Process());
 
     registerProcessActionFunction("pageUpdates/updateCategoryListing", new DbmGraphApi.processAction.pageUpdates.UpdateCategoryListing());
     registerProcessActionFunction("pageUpdates/updateRenderedContent", new DbmGraphApi.processAction.pageUpdates.UpdateRenderedContent());

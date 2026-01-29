@@ -27,6 +27,15 @@ export default class AddAndProcessAction extends Dbm.core.BaseObject {
                     let fromItem = database.getObject(1*aData["from"]);
                     await action.addOutgoingRelation(fromItem, "from");
                 }
+
+                let data = aData["data"];
+                if(data) {
+                    if(typeof(data) === "string") {
+                        data = JSON.parse(data);
+                    }
+
+                    await action.updateField("data", data);
+                }
     
                 let processingActionStatus = await database.getTypeObject("status/actionStatus", "processing");
                 await action.replaceIncomingRelation(processingActionStatus, "for", "status/actionStatus");

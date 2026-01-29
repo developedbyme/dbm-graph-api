@@ -9,7 +9,7 @@ export default class ClearCloudflareCache extends Dbm.core.BaseObject {
         console.log("ClearCloudflareCache:process");
         //console.log(aAction);
 
-        let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
+        let database = Dbm.getRepositoryItem("graphDatabase").controller;
         let page = await aAction.singleObjectRelationQuery("out:from:page");
 
         let cloudflare = Dbm.getInstance().repository.getItem("cloudflare");

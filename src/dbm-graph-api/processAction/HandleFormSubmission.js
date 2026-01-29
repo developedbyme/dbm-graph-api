@@ -6,16 +6,13 @@ export default class HandleFormSubmission extends Dbm.core.BaseObject {
     }
 
     async process(aAction) {
-        console.log("HandleFormSubmission:process");
-        console.log(aAction);
+        //console.log("HandleFormSubmission:process");
 
         let formSubmission = await aAction.singleObjectRelationQuery("out:from:formSubmission");
         let form = await formSubmission.singleObjectRelationQuery("in:for:form");
         let formName = await form.getIdentifier();
-        console.log(formSubmission);
 
-        let formHandler = Dbm.getInstance().repository.getItem("formHandlers/" + formName);
-        console.log(formHandler);
+        let formHandler = Dbm.getRepositoryItem("formHandlers/" + formName);
 
         if(formHandler.handle) {
             formHandler.handle(formSubmission);

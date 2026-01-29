@@ -8,6 +8,7 @@ export {default as Breadcrumb} from "./Breadcrumb.js";
 export {default as Question} from "./Question.js";
 
 export * as server from "./server/index.js";
+export * as actions from "./actions/index.js";
 
 import UploadS3 from "./UploadS3.js";
 
