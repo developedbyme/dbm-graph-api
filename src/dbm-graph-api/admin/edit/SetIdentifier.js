@@ -7,6 +7,6 @@ export default class SetIdentifier extends EditBaseObject {
     }
 
     async performChange(aObject, aData, aRequest) {
-        await aObject.setIdentifier(aData["value"]);
+        await aObject.updateIdentifier(aData["value"]);
     }
 }
