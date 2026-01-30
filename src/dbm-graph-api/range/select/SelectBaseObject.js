@@ -5,6 +5,25 @@ export default class SelectBaseObject extends Dbm.core.BaseObject {
         super._construct();
     }
 
+    requireParameters(aData, ...aRequiredParameters) {
+        let isOk = true;
+        let missingParameters = [];
+
+        let currentArray = aRequiredParameters;
+        let currentArrayLength = currentArray.length;
+        for(let i = 0; i < currentArrayLength; i++) {
+            let currentParameterName = currentArray[i];
+            if(!aData[currentParameterName]) {
+                isOk = false;
+                missingParameters.push(currentParameterName);
+            }
+        }
+
+        if(!isOk) {
+            throw("Missing parameters: " + missingParameters.join(", "));
+        }
+    }
+
     async select(aQuery, aData, aRequest) {
 
     }

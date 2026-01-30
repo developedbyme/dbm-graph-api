@@ -20,54 +20,9 @@ export * as processAction from "./processAction/index.js";
 export * as taskrunner from "./taskrunner/index.js";
 export * as schema from "./schema/index.js";
 
-let fullSelectSetup = function() {
-    let selectPrefix = "graphApi/range/select/";
-    {
-        let name = "idSelection";
-        let currentSelect = new DbmGraphApi.range.select.IdSelection();
-        currentSelect.item.register(selectPrefix + name);
-    }
-
-    {
-        let name = "byObjectType";
-        let currentSelect = new DbmGraphApi.range.select.ByObjectType();
-        currentSelect.item.register(selectPrefix + name);
-    }
-
-    {
-        let name = "includePrivate";
-        let currentSelect = new DbmGraphApi.range.select.IncludePrivate();
-        currentSelect.item.register(selectPrefix + name);
-    }
-
-    {
-        let name = "includeDraft";
-        let currentSelect = new DbmGraphApi.range.select.IncludeDraft();
-        currentSelect.item.register(selectPrefix + name);
-    }
-
-    {
-        let name = "objectRelationQuery";
-        let currentSelect = new DbmGraphApi.range.select.ObjectRelationQuery();
-        currentSelect.item.register(selectPrefix + name);
-    }
-
-    {
-        let name = "globalObjectRelationQuery";
-        let currentSelect = new DbmGraphApi.range.select.GlobalObjectRelationQuery();
-        currentSelect.item.register(selectPrefix + name);
-    }
-
-    {
-        let name = "withIdentifier";
-        let currentSelect = new DbmGraphApi.range.select.WithIdentifier();
-        currentSelect.item.register(selectPrefix + name);
-    }
+export const fullSelectSetup = function() {
+    DbmGraphApi.range.select.fullSetup();
 }
-
-
-
-export {fullSelectSetup};
 
 let registerEncoding = function(aName, aEncoder) {
     let encodePrefix = "graphApi/range/encode/";
