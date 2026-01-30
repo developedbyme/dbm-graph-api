@@ -22,12 +22,13 @@ export default class ProcessActions extends Dbm.core.BaseObject {
             let actionType = await action.getSingleLinkedType("type/actionType");
             
             let processActionItem = Dbm.getInstance().repository.getItemIfExists("graphApi/processAction/" + actionType);
-
+            
             if(processActionItem) {
                 await processActionItem.controller.process(action);
                 await action.changeLinkedType("status/actionStatus", "done");
             }
             else {
+                console.warn("No action of type", actionType);
                 await action.changeLinkedType("status/actionStatus", "noAction");
             }
 
