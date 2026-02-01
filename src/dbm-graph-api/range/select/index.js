@@ -5,6 +5,7 @@ export {default as IdSelection} from "./IdSelection.js";
 export {default as ByObjectType} from "./ByObjectType.js";
 export {default as IncludePrivate} from "./IncludePrivate.js";
 export {default as IncludeDraft} from "./IncludeDraft.js";
+export {default as IncludeAnyStatus} from "./IncludeAnyStatus.js";
 export {default as ObjectRelationQuery} from "./ObjectRelationQuery.js";
 export {default as GlobalObjectRelationQuery} from "./GlobalObjectRelationQuery.js";
 export {default as WithIdentifier} from "./WithIdentifier.js";
@@ -24,6 +25,7 @@ export const fullSetup = function() {
 
     register("includePrivate", new DbmGraphApi.range.select.IncludePrivate());
     register("includeDraft", new DbmGraphApi.range.select.IncludeDraft());
+    register("includeAnyStatus", new DbmGraphApi.range.select.IncludeAnyStatus());
 
     register("objectRelationQuery", new DbmGraphApi.range.select.ObjectRelationQuery());
     register("globalObjectRelationQuery", new DbmGraphApi.range.select.GlobalObjectRelationQuery());

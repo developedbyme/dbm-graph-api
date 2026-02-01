@@ -341,6 +341,43 @@ export const setupEndpoints = function(aServer) {
 		return { success: false, error: "incorrect", message: "Incorrect details"};
 	});
 
+    aServer.post('/api/user/loginWith/*', async function handler (aRequest, aReply) {
+        let params = {...aRequest.body};
+
+        let request = new UrlRequest();
+        request.setup(aRequest, aReply);
+
+        let currentUrl = url.parse(aRequest.url);
+        let functionName = currentUrl.pathname.substring("/api/user/loginWith/".length);
+
+        let loginMethod = Dbm.getInstance().repository.getItemIfExists("loginMethods/" + functionName);
+        if(!loginMethod) {
+            aReply.code(404);
+            return { success: false, error: "notFound", message: "No login method " + functionName};
+        }
+
+        let user = await loginMethod.controller.getUser(params);
+        console.log(user);
+        if(user) {
+            let sessionId = await user.createSession();
+
+            let tempArray = sessionId.split(":");
+            let sessionDatabaseId = 1*tempArray[0];
+			let expiresTime = 1*tempArray[2];
+			let expiresDate = (new Date(expiresTime)).toUTCString();
+
+			aReply.header("Set-Cookie", "dbm_session=" +sessionId + "; Path=/; Expires=" + expiresDate + "; HttpOnly;");
+
+            let wsToken = crypto.randomBytes(32).toString('base64');
+            let expiryLength = 60;
+            let hashedWsToken = await user.generateSignedSessionToken(sessionDatabaseId, (new Date()).valueOf()+expiryLength*1000, wsToken, sessionId)
+
+			return { success: true, data: {id: user.id, "wsToken": hashedWsToken}};
+        }
+
+        return { success: false, error: "incorrect", message: "Incorrect details"};
+    });
+
     let getPublicSessionIdFomCookie = function(aCookies) {
         if(aCookies) {
             let cookies = aCookies.split(";");
