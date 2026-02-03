@@ -693,10 +693,18 @@ export const setupSite = function(aServer) {
 		let assetsUri = site.assetsUri;
 		let language = site.language;
 		let siteName = site.name;
-		let loader = "loader.js?version=" + site.version;
-		if((process.env.NODE_ENV === "production" && request.query.forceLoad !== "unminified") || request.query.forceLoad === "minified") {
-			loader = "loader.min.js?version=" + site.version;
-		}
+        let loaderName = "loader";
+		
+        if(request.query.forceLoader) {
+            loaderName = request.query.forceLoader;
+        }
+        else {
+            if((process.env.NODE_ENV === "production" && request.query.forceLoad !== "unminified") || request.query.forceLoad === "minified") {
+                loaderName += ".min";
+            }
+        }
+        
+        let loader = loaderName + ".js?version=" + site.version;
 
 		let url = request.url;
         let shouldRedirect = false;
