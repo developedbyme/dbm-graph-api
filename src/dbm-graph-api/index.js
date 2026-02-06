@@ -9,6 +9,7 @@ import UrlRequest from "./UrlRequest.js";
 import fs from "node:fs";
 import sharp from 'sharp';
 import mime from 'mime';
+import { htmlToText } from "html-to-text";
 
 export {Api};
 
@@ -275,6 +276,29 @@ export const setupInternalTaskRunner = function() {
     
 }
 
+export const fullSettingsSetup = function() {
+    let htmlToTextConverter = {"item": new Dbm.repository.Item(), "convertToText": function(aHtmlText) {
+        return htmlToText(aHtmlText, {
+            wordwrap: false,
+            selectors: [
+                {
+                    selector: "a",
+                    options: {
+                        hideLinkHrefIfSameAsText: true
+                    }
+                },
+                {
+                    selector: "img",
+                    format: "skip"
+                }
+                
+            ]
+        });
+    }};
+    htmlToTextConverter.item.setValue("controller", htmlToTextConverter);
+    htmlToTextConverter.item.register("htmlToTextConverter");
+}
+
 export const fullSetup = function() {
 
     fullSelectSetup();
@@ -283,6 +307,7 @@ export const fullSetup = function() {
     fullActionSetup();
     fullProcessActionSetup();
     setupInternalTaskRunner();
+    fullSettingsSetup();
     
     DbmGraphApi.admin.edit.fullSetup();
 }
@@ -340,7 +365,6 @@ export const setupEndpoints = function(aServer) {
         }
 
         let user = await loginMethod.controller.getUser(params);
-        console.log(user);
         if(user) {
             let sessionId = await user.createSession();
 

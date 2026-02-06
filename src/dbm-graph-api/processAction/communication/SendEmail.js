@@ -23,6 +23,8 @@ export default class SendEmail extends Dbm.core.BaseObject {
         message.setTextContent(data["textContent"]);
         message.setHtmlContent(data["htmlContent"]);
 
+        message.item.additionalData = data["additionalData"];
+
         await message.send();
     }
 }
