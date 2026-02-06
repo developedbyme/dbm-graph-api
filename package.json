@@ -11,14 +11,15 @@
   "license": "MIT",
   "description": "",
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.741.0",
-    "@aws-sdk/s3-request-presigner": "^3.741.0",
+    "@aws-sdk/client-s3": "^3.984.0",
+    "@aws-sdk/s3-request-presigner": "^3.984.0",
     "dbm": "^1.4.6",
-    "mime": "^4.0.6",
-    "sharp": "^0.33.5",
-    "ws": "^8.18.0"
+    "mime": "^4.1.0",
+    "node-cron": "^4.2.1",
+    "sharp": "^0.34.5",
+    "ws": "^8.19.0"
   },
   "optionalDependencies": {
-    "bufferutil": "^4.0.9"
+    "bufferutil": "^4.1.0"
   }
 }
