@@ -24,7 +24,7 @@ export const fullSelectSetup = function() {
     DbmGraphApi.range.select.fullSetup();
 }
 
-let registerEncoding = function(aName, aEncoder) {
+export const registerEncoding = function(aName, aEncoder) {
     let encodePrefix = "graphApi/range/encode/";
     aEncoder.item.register(encodePrefix + aName);
     aEncoder.item.setValue("encodingType", aName);
@@ -32,15 +32,11 @@ let registerEncoding = function(aName, aEncoder) {
     return aEncoder;
 }
 
-export {registerEncoding};
-
-let registerEncodingClass = function(aEncoderClass) {
+export const registerEncodingClass = function(aEncoderClass) {
     return registerEncoding(aEncoderClass.DEFAULT_ENCODING_NAME, new aEncoderClass());
 }
 
-export {registerEncodingClass};
-
-let fullEncodeSetup = function() {
+export const fullEncodeSetup = function() {
     let encodePrefix = "graphApi/range/encode/";
     {
         let name = "example";
@@ -195,9 +191,7 @@ let fullEncodeSetup = function() {
     registerEncoding("action", new DbmGraphApi.range.encode.Action());
 }
 
-export {fullEncodeSetup};
-
-export let registerDataFunction = function(aName, aDataFunction) {
+export const registerDataFunction = function(aName, aDataFunction) {
 
     aDataFunction.item.register("graphApi/data/" + aName);
     aDataFunction.item.setValue("functionName", aName);
@@ -205,7 +199,7 @@ export let registerDataFunction = function(aName, aDataFunction) {
     return aDataFunction;
 }
 
-let fullDataSetup = function() {
+export const fullDataSetup = function() {
     registerDataFunction("example", new DbmGraphApi.data.Example());
 
     registerDataFunction("breadcrumb", new DbmGraphApi.data.Breadcrumb());
@@ -221,9 +215,7 @@ let fullDataSetup = function() {
     registerDataFunction("server/status", new DbmGraphApi.data.server.Status());
 }
 
-export {fullDataSetup};
-
-export let registerActionFunction = function(aName, aDataFunction) {
+export const registerActionFunction = function(aName, aDataFunction) {
 
     aDataFunction.item.register("graphApi/action/" + aName);
     aDataFunction.item.setValue("functionName", aName);
@@ -231,7 +223,7 @@ export let registerActionFunction = function(aName, aDataFunction) {
     return aDataFunction;
 }
 
-let fullActionSetup = function() {
+export const fullActionSetup = function() {
     registerActionFunction("example", new DbmGraphApi.action.Example());
     registerActionFunction("submitForm", new DbmGraphApi.action.SubmitForm());
     registerActionFunction("incomingWebhook", new DbmGraphApi.action.IncomingWebhook());
@@ -249,9 +241,7 @@ let fullActionSetup = function() {
     registerActionFunction("development/reRenderPages", new DbmGraphApi.action.development.ReRenderPages());
 }
 
-export {fullActionSetup};
-
-export let registerProcessActionFunction = function(aName, aDataFunction) {
+export const registerProcessActionFunction = function(aName, aDataFunction) {
 
     aDataFunction.item.register("graphApi/processAction/" + aName);
     aDataFunction.item.setValue("functionName", aName);
@@ -259,7 +249,7 @@ export let registerProcessActionFunction = function(aName, aDataFunction) {
     return aDataFunction;
 }
 
-let fullProcessActionSetup = function() {
+export const fullProcessActionSetup = function() {
     registerProcessActionFunction("example", new DbmGraphApi.processAction.Example());
 
     registerProcessActionFunction("handleFormSubmission", new DbmGraphApi.processAction.HandleFormSubmission());
@@ -273,9 +263,7 @@ let fullProcessActionSetup = function() {
     registerProcessActionFunction("pageUpdates/clearCache", new DbmGraphApi.processAction.pageUpdates.ClearCloudflareCache());
 }
 
-export {fullProcessActionSetup};
-
-let setupInternalTaskRunner = function() {
+export const setupInternalTaskRunner = function() {
     Dbm.getRepositoryItem("taskRunner").requireProperty("runners", []);
 
     let runner = new DbmGraphApi.taskrunner.InternalTaskRunner();
@@ -287,10 +275,7 @@ let setupInternalTaskRunner = function() {
     
 }
 
-export {setupInternalTaskRunner};
-
-
-let fullSetup = function() {
+export const fullSetup = function() {
 
     fullSelectSetup();
     fullEncodeSetup();
@@ -301,8 +286,6 @@ let fullSetup = function() {
     
     DbmGraphApi.admin.edit.fullSetup();
 }
-
-export {fullSetup};
 
 export const setupEndpoints = function(aServer) {
     aServer.post('/api/user/login', async function handler (aRequest, aReply) {
