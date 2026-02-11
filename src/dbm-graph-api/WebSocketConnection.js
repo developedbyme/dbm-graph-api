@@ -166,22 +166,38 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
             case "item":
                 {
                     let id = data['id'];
-                    //METODO: check visibility in database
-
-                    let encodeSession = new DbmGraphApi.range.EncodeSession();
-                    encodeSession.outputController = this;
+                    
+                    let isOk = false;
+                    let visibility = await Dbm.node.getDatabase().getObjectVisibility(id);
+                    if(visibility === "public") {
+                        isOk = true;
+                    }
+                    else {
+                        let isAdmin = await this.hasRole("admin");
+                        if(isAdmin) {
+                            isOk = true;
+                        }
+                    }
 
                     let logs = [];
 
-                    try {
-                        await encodeSession.encodeSingleWithTypes(id, data.encode);
-                    }
-                    catch(theError) {
-                        logs.push(theError.message);
-                        console.error(theError);
-                    }
+                    if(isOk) {
+                        let encodeSession = new DbmGraphApi.range.EncodeSession();
+                        encodeSession.outputController = this;
 
-                    encodeSession.destroy();
+                        try {
+                            await encodeSession.encodeSingleWithTypes(id, data.encode);
+                        }
+                        catch(theError) {
+                            logs.push(theError.message);
+                            console.error(theError);
+                        }
+
+                        encodeSession.destroy();
+                    }
+                    else {
+                        logs.push("Not allowed to load item");
+                    }
 
                     this._sendData({"type": "item/response", "id": id, "requestId": data["requestId"], "logs": logs});
                 }
@@ -192,32 +208,47 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
                     if(url[url.length-1] !== "/") {
                         url += "/";
                     }
-                    //METODO: check visibility in database
-
                     
-
-                    let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
+                    let database = Dbm.node.getDatabase();
                     let urlObject = await database.getObjectByUrl(url);
 
-                    if(urlObject) {
-                        let encodeSession = new DbmGraphApi.range.EncodeSession();
-                        encodeSession.outputController = this;
+                    let logs = [];
 
-                        await encodeSession.encodeSingleWithTypes(urlObject.id, ["urlRequest"]);
-                        encodeSession.destroy();
-                        this._sendData({"type": "url/response", "id": urlObject.id, "requestId": data["requestId"]});
+                    let id = 0;
+                    if(urlObject) {
+                        id = urlObject.id;
+
+                        let isOk = false;
+                        let visibility = await urlObject.getVisibility();
+                        if(visibility === "public") {
+                            isOk = true;
+                        }
+                        else {
+                            let isAdmin = await this.hasRole("admin");
+                            if(isAdmin) {
+                                isOk = true;
+                            }
+                        }
+
+                        if(isOk) {
+                            let encodeSession = new DbmGraphApi.range.EncodeSession();
+                            encodeSession.outputController = this;
+
+                            await encodeSession.encodeSingleWithTypes(urlObject.id, ["urlRequest"]);
+                            encodeSession.destroy();
+                        }
+                        else {
+                            logs.push("Not allowed to load item");
+                        }
                     }
-                    else {
-                        this._sendData({"type": "url/response", "id": 0, "requestId": data["requestId"]});
-                    }
+                    
+                    this._sendData({"type": "url/response", "id": id, "requestId": data["requestId"], "logs": logs});
                 }
                 break;
             case "admin/createObject":
                 {
-                    //METODO: require role
                     let returnId = 0;
-                    let user = await this.getUser();
-                    if(user) {
+                    if(await this.hasRole("admin")) {
                         let types = data['types'];
                         let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
                         let visibility = data['visibility'] ? data['visibility'] : 'draft';
@@ -256,8 +287,7 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
 
                     let theObject = database.getObject(data.id);
 
-                    let user = await this.getUser();
-                    if(user) {
+                    if(await this.hasRole("admin")) {
                         if(data.changes) {
                             await this._applyChanges(theObject, data.changes, request);
                         }
@@ -288,21 +318,28 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
 
                     let isVerified = await user.verifySignedSessionToken(data.token);
 
+                    let roleIds = [];
                     let userId = 0;
                     if(isVerified) {
-                        //METODO: set user for connection
-                        
                         userId = user.id;
                         this.item.setValue("user", user);
+
+                        let roles = await user.getRoles();
+            
+                        let currentArray = roles;
+                        let currentArrayLength = currentArray.length;
+                        for(let i = 0; i < currentArrayLength; i++) {
+                            roleIds.push(await currentArray[i].getIdentifier());
+                        }
                     }
 
-                    this._sendData({"type": "currentUser/response", "id": userId, "requestId": data["requestId"]});
+                    this._sendData({"type": "currentUser/response", "id": userId, "roles": roleIds, "requestId": data["requestId"]});
                 }
                 break;
             case "user/signOut":
                 {
                     this.item.setValue("user", null);
-                    this._sendData({"type": "currentUser/response", "id": 0, "requestId": data["requestId"]});
+                    this._sendData({"type": "currentUser/response", "id": 0, "roles": [], "requestId": data["requestId"]});
                 }
                 break;
             case "heartbeat":
@@ -367,19 +404,27 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
         
     }
 
-    setInitialUser(aId) {
+    async setInitialUser(aId) {
+
+        let roleIds = [];
 
         if(aId) {
-            let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
-
-            let user = database.getUser(aId);
+            let user = Dbm.node.getDatabase().getUser(aId);
             this.item.setValue("user", user);
+
+            let roles = await user.getRoles();
+            
+            let currentArray = roles;
+            let currentArrayLength = currentArray.length;
+            for(let i = 0; i < currentArrayLength; i++) {
+                roleIds.push(await currentArray[i].getIdentifier());
+            }
         }
         else {
             this.item.setValue("user", null);
         }
 
-        this._sendData({"type": "connectionReady", "user": aId});
+        this._sendData({"type": "connectionReady", "user": aId, "roles": roleIds});
     }
 
     async getUser() {
@@ -393,6 +438,26 @@ export default class WebSocketConnection extends Dbm.core.BaseObject {
 			throw(new Error("Only signed in users can use this endpoint"));
 		}
 
+        let hasRole = await user.hasRole(aRole);
+        if(!hasRole) {
+            throw(new Error("User doesn't have privileges"));
+        }
+
 		return true;
 	}
+
+    async hasRole(aRole) {
+        let user = await this.getUser();
+
+		if(!user) {
+			return false;
+		}
+
+        let hasRole = await user.hasRole(aRole);
+        if(!hasRole) {
+            return false;
+        }
+
+		return true;
+    }
 }

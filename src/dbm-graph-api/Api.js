@@ -25,7 +25,7 @@ export default class Api extends Dbm.core.BaseObject {
         return this;
     }
 
-    _callback_connection(aWebSocket, aRequest) {
+    async _callback_connection(aWebSocket, aRequest) {
         let newWebSocketConnection = new WebSocketConnection();
 
         newWebSocketConnection.item.setValue("api", this.item);
@@ -48,17 +48,15 @@ export default class Api extends Dbm.core.BaseObject {
                     let userId = 1*value.split(":")[1];
                     let user = Dbm.getRepositoryItem("graphDatabase").controller.getUser(userId);
     
-                    user.verifySession(value).then(function(aIsValidSession) {
-                        //console.log("verifySession", aIsValidSession);
+                    let isValidSession = await user.verifySession(value);
     
-                        if(aIsValidSession) {
-                            newWebSocketConnection.setInitialUser(userId);
-                        }
-                        else {
-                            newWebSocketConnection.setInitialUser(0);
-                        }
-                        
-                    });
+                    if(isValidSession) {
+                        await newWebSocketConnection.setInitialUser(userId);
+                    }
+                    else {
+                        await newWebSocketConnection.setInitialUser(0);
+                    };
+
                     hasUserCookie = true;
                     break;
                 }
@@ -66,7 +64,7 @@ export default class Api extends Dbm.core.BaseObject {
         }
         
         if(!hasUserCookie) {
-            newWebSocketConnection.setInitialUser(0);
+            await newWebSocketConnection.setInitialUser(0);
         }
     }
 	

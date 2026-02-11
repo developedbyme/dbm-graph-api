@@ -30,16 +30,36 @@ export default class UrlRequest extends Dbm.core.BaseObject {
         let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
         let urlObject = await database.getObjectByUrl(url);
 
-        if(urlObject) {
-            let encodeSession = new DbmGraphApi.range.EncodeSession();
-            encodeSession.outputController = this;
+		let logs = [];
 
-            await encodeSession.encodeSingleWithTypes(urlObject.id, ["urlRequest"]);
-            encodeSession.destroy();
-            this._responseData = {"id": urlObject.id};
+        if(urlObject) {
+			let isOk = false;
+			let visibility = await urlObject.getVisibility();
+			if(visibility === "public") {
+				isOk = true;
+			}
+			else {
+				let isAdmin = await this.hasRole("admin");
+				if(isAdmin) {
+					isOk = true;
+				}
+			}
+
+			if(isOk) {
+				let encodeSession = new DbmGraphApi.range.EncodeSession();
+				encodeSession.outputController = this;
+
+				await encodeSession.encodeSingleWithTypes(urlObject.id, ["urlRequest"]);
+				encodeSession.destroy();
+				this._responseData = {"id": urlObject.id, "logs": logs};
+			}
+            else {
+				this._responseData = {"id": urlObject.id, "logs": ["Not allowed to load item"]};
+			}
         }
         else {
-            this._responseData = {"id": 0};
+			logs.push("Not found");
+            this._responseData = {"id": 0, "logs": logs};
         }
 	}
 	
@@ -111,13 +131,29 @@ export default class UrlRequest extends Dbm.core.BaseObject {
 		let encodeSession = new DbmGraphApi.range.EncodeSession();
 		encodeSession.outputController = this;
 
-		//METODO: check visibility
+		let isOk = false;
+		let visibility = await Dbm.node.getDatabase().getObjectVisibility(aId);
+		if(visibility === "public") {
+			isOk = true;
+		}
+		else {
+			let isAdmin = await this.hasRole("admin");
+			if(isAdmin) {
+				isOk = true;
+			}
+		}
 
-		await encodeSession.encodeSingleWithTypes(aId, aEncodes);
+		let logs = [];
+		if(isOk) {
+			await encodeSession.encodeSingleWithTypes(aId, aEncodes);
 
-		encodeSession.destroy();
+			encodeSession.destroy();
+		}
+		else {
+			logs.push("Not allowed to load item");
+		}
 
-		this._responseData = {"id": aId};
+		this._responseData = {"id": aId, "logs": logs};
 	}
 	
 	async requestData(aFunctionName, aData) {
@@ -236,6 +272,26 @@ export default class UrlRequest extends Dbm.core.BaseObject {
 			throw(new Error("Only signed in users can use this endpoint"));
 		}
 
+		let hasRole = await user.hasRole(aRole);
+        if(!hasRole) {
+    		throw(new Error("User doesn't have privileges"));
+        }
+
 		return true;
 	}
+
+	async hasRole(aRole) {
+        let user = await this.getUser();
+
+		if(!user) {
+			return false;
+		}
+
+        let hasRole = await user.hasRole(aRole);
+        if(!hasRole) {
+            return false;
+        }
+
+		return true;
+    }
 }
