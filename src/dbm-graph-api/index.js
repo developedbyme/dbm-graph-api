@@ -558,7 +558,7 @@ export const setupEndpoints = function(aServer) {
         request.setup(aRequest, aReply);
 
         let currentUrl = url.parse(aRequest.url);
-        let webhookType = currentUrl.pathname.substring("/api/incomingWebhook/".length);
+        let webhookType = currentUrl.pathname.substring("/api/webhook/".length);
 
         await request.incomingWebhook(webhookType, params);
 
@@ -571,7 +571,7 @@ export const setupEndpoints = function(aServer) {
         request.setup(aRequest, aReply);
 
         let currentUrl = url.parse(aRequest.url);
-        let webhookType = currentUrl.pathname.substring("/api/incomingWebhook/".length);
+        let webhookType = currentUrl.pathname.substring("/api/webhook/".length);
 
         await request.incomingWebhook(webhookType, params);
 

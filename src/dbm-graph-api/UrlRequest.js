@@ -202,15 +202,15 @@ export default class UrlRequest extends Dbm.core.BaseObject {
 
 		let incomingWebhook = await database.createObject("private", ["incomingWebhook"]);
 		await incomingWebhook.updateField("data", data);
-		await incomingWebhook.addIncomingRelation(webhookType, "for");
+		await incomingWebhook.incomingRelations.add(webhookType, "for");
 		
 		let actionType = await database.getTypeObject("type/actionType", "incomingWebhook/" + type);
 		let actionStatus = await database.getTypeObject("status/actionStatus", "readyToProcess");
 		
 		let action = await database.createObject("private", ["action"]);
-		await action.addIncomingRelation(actionType, "for");
-		await action.addIncomingRelation(incomingWebhook, "from");
-		await action.addIncomingRelation(actionStatus, "for");
+		await action.incomingRelations.add(actionType, "for");
+		await action.outgoingRelations.add(incomingWebhook, "from");
+		await action.incomingRelations.add(actionStatus, "for");
 
 		returnObject["id"] = incomingWebhook.id;
 		returnObject["action"] = action.id;
