@@ -3,6 +3,8 @@ import Dbm from "dbm";
 export default class SendEmail extends Dbm.core.BaseObject {
     _construct() {
         super._construct();
+
+        this.item.requireProperty("client", null);
     }
 
     async process(aAction) {

@@ -236,6 +236,9 @@ export const fullActionSetup = function() {
     registerActionFunction("admin/setup/setupWebsite", new DbmGraphApi.action.admin.setup.SetupWebsite());
     registerActionFunction("admin/setup/setupOrganization", new DbmGraphApi.action.admin.setup.SetupOrganization());
 
+    registerActionFunction("verification/sendEmailVerification", new DbmGraphApi.action.verification.SendEmailVerification());
+    registerActionFunction("verification/verify", new DbmGraphApi.action.verification.Verify());
+
     registerActionFunction("development/restartServer", new DbmGraphApi.action.development.RestartServer());
     registerActionFunction("development/restartDatabaseConnection", new DbmGraphApi.action.development.RestartDatabaseConnection());
 
