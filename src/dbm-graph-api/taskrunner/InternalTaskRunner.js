@@ -50,8 +50,7 @@ export default class InternalTaskRunner extends Dbm.core.BaseObject {
 
         if(this._isRunning) {
             if(runDirect) {
-                console.log("Run direct");
-                this._intervalId = setTimeout(this._runNextTaskBound, 1);
+                setImmediate(this._runNextTaskBound);
             }
             else {
                 this._intervalId = setTimeout(this._runNextTaskBound, this._timeBetween*1000);
