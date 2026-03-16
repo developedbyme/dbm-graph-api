@@ -20,6 +20,7 @@ export default class ProcessActions extends Dbm.core.BaseObject {
             await action.changeLinkedType("status/actionStatus", "processing");
 
             let actionType = await action.getSingleLinkedType("type/actionType");
+            console.log("Action type: " + actionType);
             
             let processActionItem = Dbm.getInstance().repository.getItemIfExists("graphApi/processAction/" + actionType);
             
@@ -39,6 +40,7 @@ export default class ProcessActions extends Dbm.core.BaseObject {
             returnObject["remaining"] = 0;
         }
 
+        console.log(returnObject);
         return returnObject;
     }
 }
