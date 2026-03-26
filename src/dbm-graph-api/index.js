@@ -773,7 +773,7 @@ export const setupSite = function(aServer) {
                 }
 
 				returnString += `<link rel="stylesheet" type="text/css" href="${assetsUri}css/main.css?version=${version}" />
-				<meta name="viewport" content="initial-scale=1,user-scalable=yes" />
+				<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=yes" />
 				<meta name="HandheldFriendly" content="true" />
 				<link rel="icon" type="image/png" href="${assetsUri}img/favicon.png" />
 				</head>
@@ -831,7 +831,7 @@ export const setupSite = function(aServer) {
 <html lang="${language}">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<meta name="viewport" content="initial-scale=1,user-scalable=yes" />
+		<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=yes" />
 		<meta name="HandheldFriendly" content="true" />
         <title>${fields.title} - ${siteName}</title>` + "\n";
         if(fields['meta/description']) {
