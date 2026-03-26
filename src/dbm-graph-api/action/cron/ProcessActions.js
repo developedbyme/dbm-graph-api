@@ -40,7 +40,6 @@ export default class ProcessActions extends Dbm.core.BaseObject {
             returnObject["remaining"] = 0;
         }
 
-        console.log(returnObject);
         return returnObject;
     }
 }
