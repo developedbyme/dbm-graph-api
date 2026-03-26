@@ -92,6 +92,20 @@ export default class EncodeSession extends Dbm.core.BaseObject {
         return ids;
     }
 
+    async encodeObjectsById(aIds, aType) {
+        let currentArray = aIds;
+        let currentArrayLength = currentArray.length;
+        let promises = new Array(currentArrayLength);
+        for(let i = 0; i < currentArrayLength; i++) {
+            let id = currentArray[i];
+            promises[i] = this._encodeSingleNoAwait(id, aType);
+        }
+
+        await Promise.all(promises);
+
+        return aIds;
+    }
+
     outputEncodedData(aId, aData, aEncoding) {
         //console.log("EncodeSession::outputEncodedData");
 
