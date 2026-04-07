@@ -183,6 +183,9 @@ export default class UrlRequest extends Dbm.core.BaseObject {
 		if(dataFunctionItem) {
 			returnData = await dataFunctionItem.controller.performAction(aData, encodeSession);
 		}
+		else {
+			this._logs.push("No action named " + aFunctionName);
+		}
 
 		this._responseData = returnData;
 	}
