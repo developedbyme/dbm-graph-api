@@ -38,7 +38,7 @@ export default class AddAndProcessAction extends Dbm.core.BaseObject {
                 }
     
                 let processingActionStatus = await database.getTypeObject("status/actionStatus", "processing");
-                await action.replaceIncomingRelation(processingActionStatus, "for", "status/actionStatus");
+                await action.incomingRelations.replace(processingActionStatus, "for", "status/actionStatus");
     
                 let processActionItem = Dbm.getInstance().repository.getItemIfExists("graphApi/processAction/" + type);
     
@@ -47,11 +47,11 @@ export default class AddAndProcessAction extends Dbm.core.BaseObject {
                     await processActionItem.controller.process(action);
     
                     let doneActionStatus = await database.getTypeObject("status/actionStatus", "done");
-                    await action.replaceIncomingRelation(doneActionStatus, "for", "status/actionStatus");
+                    await action.incomingRelations.replace(doneActionStatus, "for", "status/actionStatus");
                 }
                 else {
                     let doneActionStatus = await database.getTypeObject("status/actionStatus", "noAction");
-                    await action.replaceIncomingRelation(doneActionStatus, "for", "status/actionStatus");
+                    await action.incomingRelations.replace(doneActionStatus, "for", "status/actionStatus");
                 }
             }
             

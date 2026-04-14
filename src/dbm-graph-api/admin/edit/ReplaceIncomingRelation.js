@@ -7,6 +7,6 @@ export default class ReplaceIncomigRelation extends EditBaseObject {
     }
 
     async performChange(aObject, aData, aRequest) {
-        await aObject.replaceIncomingRelation(aData["value"], aData["type"], aData["objectType"]);
+        await aObject.incomingRelations.replace(aData["value"], aData["type"], aData["objectType"]);
     }
 }
