@@ -190,6 +190,9 @@ export const fullEncodeSetup = function() {
     registerEncoding("menuItem", new DbmGraphApi.range.encode.MenuItem());
 
     registerEncoding("action", new DbmGraphApi.range.encode.Action());
+
+    registerEncoding("review", new DbmGraphApi.range.encode.Review());
+    registerEncoding("reviewSource", new DbmGraphApi.range.encode.ReviewSource());
 }
 
 export const registerDataFunction = function(aName, aDataFunction) {

@@ -30,5 +30,7 @@ export {default as MenuLocation} from "./MenuLocation.js";
 export {default as Menu} from "./Menu.js";
 export {default as MenuItem} from "./MenuItem.js";
 export {default as Action} from "./Action.js";
+export {default as Review} from "./Review.js";
+export {default as ReviewSource} from "./ReviewSource.js";
 
 export * as admin from "./admin/index.js";
