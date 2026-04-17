@@ -1,0 +1,1 @@
+export {default as UpdateReviews} from "./UpdateReviews.js";

@@ -265,6 +265,8 @@ export const fullProcessActionSetup = function() {
     registerProcessActionFunction("pageUpdates/updateCategoryListing", new DbmGraphApi.processAction.pageUpdates.UpdateCategoryListing());
     registerProcessActionFunction("pageUpdates/updateRenderedContent", new DbmGraphApi.processAction.pageUpdates.UpdateRenderedContent());
     registerProcessActionFunction("pageUpdates/clearCache", new DbmGraphApi.processAction.pageUpdates.ClearCloudflareCache());
+
+    registerProcessActionFunction("googleMaps/updateReviews", new DbmGraphApi.processAction.googleMaps.UpdateReviews());
 }
 
 export const setupInternalTaskRunner = function() {
