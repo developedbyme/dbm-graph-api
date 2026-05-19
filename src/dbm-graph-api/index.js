@@ -232,6 +232,7 @@ export const fullActionSetup = function() {
     registerActionFunction("submitForm", new DbmGraphApi.action.SubmitForm());
     registerActionFunction("incomingWebhook", new DbmGraphApi.action.IncomingWebhook());
     registerActionFunction("cron/processActions", new DbmGraphApi.action.cron.ProcessActions());
+    registerActionFunction("cron/runFollowUpAction", new DbmGraphApi.action.cron.RunFollowUpAction());
     registerActionFunction("admin/addAndProcessAction", new DbmGraphApi.action.admin.AddAndProcessAction());
     registerActionFunction("admin/addUser", new DbmGraphApi.action.admin.AddUser());
     registerActionFunction("admin/user/setPassword", new DbmGraphApi.action.admin.SetPassword());
