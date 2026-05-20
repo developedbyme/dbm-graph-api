@@ -987,3 +987,20 @@ export const setupSite = function(aServer) {
 		return returnString;
 	});
 }
+
+export const setupStaticFileEndpoint = function(aFastify, aPath, aFilePath) {
+    aFastify.get(aPath, async (request, reply) => {
+        try {
+            let filePath = aFilePath;
+
+            await fs.promises.access(filePath, fs.constants.R_OK);
+
+            return reply.send(fs.createReadStream(filePath));
+        }
+        catch (theError) {
+            return reply.code(404).send({
+                error: "File not found",
+            });
+        }
+    });
+}
