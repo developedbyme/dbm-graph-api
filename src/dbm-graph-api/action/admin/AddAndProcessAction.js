@@ -21,11 +21,11 @@ export default class AddAndProcessAction extends Dbm.core.BaseObject {
                 returnObject["id"] = action.id;
 
                 let actionType = await database.getTypeObject("type/actionType", type);
-                await action.addIncomingRelation(actionType, "for");
+                await action.incomingRelations.add(actionType, "for");
     
                 if(aData["from"]) {
                     let fromItem = database.getObject(1*aData["from"]);
-                    await action.addOutgoingRelation(fromItem, "from");
+                    await action.outgoingRelations.add(fromItem, "from");
                 }
 
                 let data = aData["data"];
