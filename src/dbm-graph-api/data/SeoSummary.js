@@ -34,7 +34,7 @@ export default class SeoSummary extends Dbm.core.BaseObject {
                {"role":"system","content": instructions},
                {"role": "user", "content": contentString}
            ],
-            "temperature": 0.7
+            "temperature": 0.4
        }
 
         let headers = {

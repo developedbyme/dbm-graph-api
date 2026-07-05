@@ -51,7 +51,7 @@ export default class Question extends Dbm.core.BaseObject {
                {"role":"system","content": instructions},
                {"role": "user", "content": question}
            ],
-            "temperature": 0.7
+            "temperature": 0
        }
 
         let headers = {
