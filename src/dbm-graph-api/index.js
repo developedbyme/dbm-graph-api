@@ -963,10 +963,13 @@ export const setupSite = function(aServer) {
         if(renderedContent) {
             renderedContentHolder = `<div id="preRenderContent">
                 <script>
-                let preRenderContent = this._element.querySelector("#preRenderContent");
-                    if(preRenderContent) {
-                        preRenderContent.style["display"] = "none";
-                    }
+                    (function() {
+                        let preRenderContent = document.querySelector("#preRenderContent");
+                        if(preRenderContent) {
+                            preRenderContent.style["display"] = "none";
+                        }
+                    })();
+                    
                 </script>
                 ${renderedContent}
             </div>`;
