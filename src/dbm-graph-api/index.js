@@ -961,7 +961,15 @@ export const setupSite = function(aServer) {
         
         let renderedContentHolder = "";
         if(renderedContent) {
-            renderedContentHolder = `<div id="preRenderContent">${renderedContent}</div>`;
+            renderedContentHolder = `<div id="preRenderContent">
+                <script>
+                let preRenderContent = this._element.querySelector("#preRenderContent");
+                    if(preRenderContent) {
+                        preRenderContent.style["display"] = "none";
+                    }
+                </script>
+                ${renderedContent}
+            </div>`;
         }
 
         let moduleData = {};
