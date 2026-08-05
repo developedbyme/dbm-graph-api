@@ -429,7 +429,7 @@ export const setupEndpoints = function(aServer) {
         return await getUserFromPublicSessionId(publicSessionId);
     }
 
-    aServer.get('/api/user/me', async function handler (aRequest, aReply) {
+    aServer.get('/api/user/me', async function(aRequest, aReply) {
         let user = await getUserFromCookie(aRequest.headers.cookie);
         if(user) {
             return {success: true, data: {id: user.id}};
@@ -438,7 +438,7 @@ export const setupEndpoints = function(aServer) {
         return {success: false, data: null};
     });
 
-	aServer.post('/api/user/logout', async function handler (aRequest, aReply) {
+	aServer.post('/api/user/logout', async function(aRequest, aReply) {
 
         let publicSessionId = getPublicSessionIdFomCookie(aRequest.headers.cookie);
         let user = await getUserFromPublicSessionId(publicSessionId);
@@ -452,7 +452,7 @@ export const setupEndpoints = function(aServer) {
         return {success: true, data: null};
 	});
 
-	aServer.post('/api/user/renewSession', async function handler (aRequest, aReply) {
+	aServer.post('/api/user/renewSession', async function(aRequest, aReply) {
 		let user = await getUserFromCookie(aRequest.headers.cookie);
         if(user) {
             //METODO: update session
@@ -460,11 +460,11 @@ export const setupEndpoints = function(aServer) {
 
             //METODO: return success
         }
-
+        
 		return {success: false, data: null};
 	});
 	
-	aServer.get('/api/url', async function handler (aRequest, aReply) {
+	aServer.get('/api/url', async function(aRequest, aReply) {
 		//console.log(aRequest);
 		
 		let url = aRequest.query.url;
@@ -479,10 +479,11 @@ export const setupEndpoints = function(aServer) {
 
 		await request.requestUrl(url);
 		
+        aReply.header("Access-Control-Allow-Origin", "*");
 		return request.getResponse();
 	});
 
-    aServer.get('/api/range/:selects/:encodes', async function handler (aRequest, aReply) {
+    aServer.get('/api/range/:selects/:encodes', async function(aRequest, aReply) {
 
         let params = {...aRequest.query};
         let selectIds = aRequest.params.selects.split(",");
@@ -502,10 +503,11 @@ export const setupEndpoints = function(aServer) {
 
         await request.requestRange(selects, encodes, params);
 
+        aReply.header("Access-Control-Allow-Origin", "*");
         return request.getResponse();
     });
 
-    aServer.get('/api/item/:id/:encodes', async function handler (aRequest, aReply) {
+    aServer.get('/api/item/:id/:encodes', async function(aRequest, aReply) {
         
         let itemId = 1*aRequest.params.id;
         let encodes = aRequest.params.encodes.split(",");
@@ -515,10 +517,11 @@ export const setupEndpoints = function(aServer) {
 
         await request.requestItem(itemId, encodes);
 
+        aReply.header("Access-Control-Allow-Origin", "*");
         return request.getResponse();
     });
 
-    aServer.get('/api/data/*', async function handler (aRequest, aReply) {
+    aServer.get('/api/data/*', async function(aRequest, aReply) {
         let params = {...aRequest.query};
         let request = new UrlRequest();
         request.setup(aRequest, aReply);
@@ -528,10 +531,11 @@ export const setupEndpoints = function(aServer) {
 
         await request.requestData(functionName, params);
 
+        aReply.header("Access-Control-Allow-Origin", "*");
         return request.getResponse();
     });
 
-    aServer.get('/api/action/*', async function handler (aRequest, aReply) {
+    aServer.get('/api/action/*', async function(aRequest, aReply) {
         
         let params = {...aRequest.query};
         let request = new UrlRequest();
@@ -542,10 +546,11 @@ export const setupEndpoints = function(aServer) {
 
         await request.performAction(functionName, params);
 
+        aReply.header("Access-Control-Allow-Origin", "*");
         return request.getResponse();
     });
 
-    aServer.post('/api/action/*', async function handler (aRequest, aReply) {
+    aServer.post('/api/action/*', async function(aRequest, aReply) {
         let params = {...aRequest.body};
         let request = new UrlRequest();
         request.setup(aRequest, aReply);
@@ -555,12 +560,13 @@ export const setupEndpoints = function(aServer) {
 
         await request.performAction(functionName, params);
 
+        aReply.header("Access-Control-Allow-Origin", "*");
         return request.getResponse();
     });
 
     //METODO: setup raw data posts
 
-    aServer.get('/api/webhook/*', async function handler (aRequest, aReply) {
+    aServer.get('/api/webhook/*', async function(aRequest, aReply) {
         
         let params = {...aRequest.query};
         let request = new UrlRequest();
@@ -574,7 +580,7 @@ export const setupEndpoints = function(aServer) {
         return request.getResponse();
     });
 
-    aServer.post('/api/webhook/*', async function handler (aRequest, aReply) {
+    aServer.post('/api/webhook/*', async function(aRequest, aReply) {
         let params = {...aRequest.body};
         let request = new UrlRequest();
         request.setup(aRequest, aReply);
@@ -589,12 +595,13 @@ export const setupEndpoints = function(aServer) {
 
     //METODO: setup edit
 
-    aServer.get('/api/', async function handler (aRequest, aResponse) {
+    aServer.get('/api/', async function(aRequest, aReply) {
+        aReply.header("Access-Control-Allow-Origin", "*");
 		return { version: Dbm.getInstance().repository.getItem("site").version };
 	});
 
-    aServer.get('/api/*', async function handler (aRequest, aResponse) {
-        aResponse.code(404);
+    aServer.get('/api/*', async function(aRequest, aReply) {
+        aReply.code(404);
 		return { success: false, error: "notFound", message: "Not found" };
 	});
 }
