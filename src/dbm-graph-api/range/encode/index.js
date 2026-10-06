@@ -34,3 +34,4 @@ export {default as Review} from "./Review.js";
 export {default as ReviewSource} from "./ReviewSource.js";
 
 export * as admin from "./admin/index.js";
+export * as ecommerce from "./ecommerce/index.js";
