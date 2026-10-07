@@ -1,7 +1,7 @@
 import Dbm from "dbm";
 import crypto from "crypto";
 
-export default class CreatePaymentIntent extends Dbm.core.BaseObject {
+export default class UpdatePaymentIntent extends Dbm.core.BaseObject {
     _construct() {
         super._construct();
     }
@@ -13,17 +13,19 @@ export default class CreatePaymentIntent extends Dbm.core.BaseObject {
 
         let stripeSettings = Dbm.repository.getItem("stripe");
 
-        let stripePaymentAttempt = await database.createObject("private", ["paymentAttempt", "paymentAttempt/stripe"]);
-        returnObject["id"] = stripePaymentAttempt.id;
+        let stripePaymentAttempt = database.getObject(1*aData["id"]);
+        let storedKey = await stripePaymentAttempt.getIdentifier();
 
-        let mode = aData["mode"] ? aData["mode"] : "default";
-        await stripePaymentAttempt.changeLinkedType("type/paymentAttemptMode", mode);
-        
-        await stripePaymentAttempt.changeLinkedType("type/paymentAttemptStatus", "pending");
+        if(storedKey !== aData["key"]) {
+            //METODO: should this throw?
+            return returnObject;
+        }
 
-        let attemptKey = crypto.randomUUID();
-        await stripePaymentAttempt.setIdentifier(attemptKey);
-        returnObject["key"] = attemptKey;
+        let currentStatus = await stripePaymentAttempt.getSingleLinkedType("type/paymentAttemptStatus");
+        if(currentStatus !== "pending") {
+            //METODO: should this throw?
+            return returnObject;
+        }
         
         let cart = aData["cart"];
         await stripePaymentAttempt.updateField("cart", cart);
@@ -46,18 +48,22 @@ export default class CreatePaymentIntent extends Dbm.core.BaseObject {
         let amount = Math.round(100*total);
 
         let body = {
-            "amount": String(amount),
-            "currency": stripeSettings.currency,
-            "metadata[attempt]": stripePaymentAttempt.id,
+            "amount": String(amount)
         }
 
         let encodedBody = new URLSearchParams(body);
 
-        await stripePaymentAttempt.updateField("stripe/createIntentBody", body);
+        let fields = await stripePaymentAttempt.getFields();
+        let updateCount = fields["stripe/updateCount"]+1;
+        await stripePaymentAttempt.updateField("stripe/updateCount", updateCount);
+
+        //METODO: move these to logs
+        await stripePaymentAttempt.updateField("stripe/updateTime" + updateCount, (new Date()).valueOf());
+        await stripePaymentAttempt.updateField("stripe/updateIntentBody" + updateCount, body);
 
         let key = Dbm.repository.getItem("stripe").secretKey;
 
-        let stripeResponse = await fetch("https://api.stripe.com/v1/payment_intents", {
+        let stripeResponse = await fetch("https://api.stripe.com/v1/payment_intents/" + fields["stripe/id"], {
             method: "POST",
             headers: {
                 "Authorization": "Bearer " + key,
@@ -67,14 +73,9 @@ export default class CreatePaymentIntent extends Dbm.core.BaseObject {
         });
 
         let responseData = await stripeResponse.json();
-        await stripePaymentAttempt.updateField("stripe/createIntentRespone", responseData);
+        await stripePaymentAttempt.updateField("stripe/updateIntentRespone" + updateCount, responseData);
 
         //METODO: handle error, responseData.error set
-
-        await stripePaymentAttempt.updateField("stripe/id", responseData.id);
-        await stripePaymentAttempt.updateField("stripe/updateCount", 0);
-
-        returnObject["clientSecret"] = responseData.client_secret;
 
         return returnObject;
     }
