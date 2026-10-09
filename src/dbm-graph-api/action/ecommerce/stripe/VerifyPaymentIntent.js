@@ -27,7 +27,10 @@ export default class VerifyPaymentIntent extends Dbm.core.BaseObject {
 
         //MEDEBUG: //
         if(currentStatus === "completed" || currentStatus === "creatingOrder") {
-            returnObject["order"] = await aEncodeSession.encodeObjectOrNull(await stripePaymentAttempt.singleObjectRelationQuery("in:from:order"), "order");
+            let order = await stripePaymentAttempt.singleObjectRelationQuery("in:from:order");
+            returnObject["order"] = await aEncodeSession.encodeObjectOrNull(order, "order");
+            returnObject["key"] = await order.getIdentifier();
+            
             returnObject["status"] = currentStatus;
             return returnObject;
         }
@@ -51,6 +54,9 @@ export default class VerifyPaymentIntent extends Dbm.core.BaseObject {
             let order = await database.createObject("private", ["order"]);
 
             await order.changeLinkedType("type/orderStatus", "creating");
+
+            let orderKey = crypto.randomUUID();
+            await order.setIdentifier(orderKey);
 
             await order.outgoingRelations.add(stripePaymentAttempt, "from");
 
@@ -101,7 +107,9 @@ export default class VerifyPaymentIntent extends Dbm.core.BaseObject {
             await stripePaymentAttempt.changeLinkedType("type/paymentAttemptStatus", "completed");
         }
 
-        returnObject["order"] = await aEncodeSession.encodeObjectOrNull(await stripePaymentAttempt.singleObjectRelationQuery("in:from:order"), "order");
+        let order = await stripePaymentAttempt.singleObjectRelationQuery("in:from:order");
+        returnObject["order"] = await aEncodeSession.encodeObjectOrNull(order, "order");
+        returnObject["key"] = await order.getIdentifier();
 
         currentStatus = await stripePaymentAttempt.getSingleLinkedType("type/paymentAttemptStatus");
         returnObject["status"] = currentStatus;

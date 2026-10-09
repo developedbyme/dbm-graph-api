@@ -11,6 +11,8 @@ export {default as GlobalObjectRelationQuery} from "./GlobalObjectRelationQuery.
 export {default as WithIdentifier} from "./WithIdentifier.js";
 export {default as IdentifiableObjectRelationQuery} from "./IdentifiableObjectRelationQuery.js";
 
+export * as ecommerce from "./ecommerce/index.js";
+
 export const PREFIX = "graphApi/range/select/";
 
 export const register = function(aName, aHandler) {
