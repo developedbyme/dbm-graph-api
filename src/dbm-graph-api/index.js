@@ -193,6 +193,8 @@ export const fullEncodeSetup = function() {
 
     registerEncoding("review", new DbmGraphApi.range.encode.Review());
     registerEncoding("reviewSource", new DbmGraphApi.range.encode.ReviewSource());
+
+    registerEncoding("creationDate", new DbmGraphApi.range.encode.CreationDate());
 }
 
 export const registerDataFunction = function(aName, aDataFunction) {

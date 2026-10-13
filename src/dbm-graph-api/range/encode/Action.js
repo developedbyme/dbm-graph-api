@@ -10,10 +10,12 @@ export default class Action extends EncodeBaseObject {
 
         let returnObject = {};
 
-        let object = Dbm.getRepositoryItem("graphDatabase").controller.getObject(aId);
+        let object = Dbm.node.getDatabase().getObject(aId);
 
         let fields = await object.getFields();
         returnObject["data"] = fields["data"] ? fields["data"] : null;
+
+        await aEncodingSession.encodeSingle(aId, "creationDate");
 
         {
             let relatedItems = await object.objectRelationQuery("out:from:*");

@@ -10,6 +10,7 @@ export {default as ObjectRelationQuery} from "./ObjectRelationQuery.js";
 export {default as GlobalObjectRelationQuery} from "./GlobalObjectRelationQuery.js";
 export {default as WithIdentifier} from "./WithIdentifier.js";
 export {default as IdentifiableObjectRelationQuery} from "./IdentifiableObjectRelationQuery.js";
+export {default as InDateRange} from "./InDateRange.js";
 
 export * as ecommerce from "./ecommerce/index.js";
 
@@ -32,4 +33,6 @@ export const fullSetup = function() {
     register("objectRelationQuery", new DbmGraphApi.range.select.ObjectRelationQuery());
     register("globalObjectRelationQuery", new DbmGraphApi.range.select.GlobalObjectRelationQuery());
     register("identifiableObjectRelationQuery", new DbmGraphApi.range.select.IdentifiableObjectRelationQuery());
+
+    register("inDateRange", new DbmGraphApi.range.select.InDateRange());
 }

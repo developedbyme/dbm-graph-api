@@ -12,7 +12,7 @@ export default class Query extends Dbm.core.BaseObject {
     }
 
     async setObjectType(aName) {
-        let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
+        let database = Dbm.node.getDatabase();
 
         let objectType = await database.getObjectType(aName);
 
@@ -59,7 +59,7 @@ export default class Query extends Dbm.core.BaseObject {
 
     addFieldQuery(aKey, aValue) {
 
-        let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
+        let database = Dbm.node.getDatabase();
 
         this._joins.push("INNER JOIN Fields ON Objects.id = Fields.object");
         this._whereStatements.push("Fields.name = " + database.connection.escape(aKey));
@@ -69,7 +69,7 @@ export default class Query extends Dbm.core.BaseObject {
     }
 
     withIdentifier(aIdentifier) {
-        let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
+        let database = Dbm.node.getDatabase();
 
         this._joins.push("INNER JOIN Identifiers ON Objects.id = Identifiers.object");
         this._whereStatements.push("Identifiers.identifier = " + database.connection.escape(aIdentifier));
@@ -77,8 +77,19 @@ export default class Query extends Dbm.core.BaseObject {
         return this;
     }
 
+    inDateRange(aStartDate = null, aEndDate = null) {
+        let database = Dbm.node.getDatabase();
+
+        if(aStartDate) {
+            this._whereStatements.push("Objects.date >= " + database.connection.escape(aStartDate));
+        }
+        if(aEndDate) {
+            this._whereStatements.push("Objects.date < " + database.connection.escape(aEndDate));
+        }
+    }
+
     async getIds() {
-        let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
+        let database = Dbm.node.getDatabase();
         
         let query = "SELECT Objects.id as id FROM Objects";
 
@@ -123,14 +134,14 @@ export default class Query extends Dbm.core.BaseObject {
     }
 
     async getObjects() {
-        let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
+        let database = Dbm.node.getDatabase();
         let ids = await this.getIds();
 
         return database.getObjects(ids);
     }
 
     async getObject() {
-        let database = Dbm.getInstance().repository.getItem("graphDatabase").controller;
+        let database = Dbm.node.getDatabase();
         let ids = await this.getIds();
 
         if(ids.length) {
